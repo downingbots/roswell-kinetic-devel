@@ -1,0 +1,43 @@
+roswell_joint_position_controller:
+
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 125
+
+  # Arm Position Controllers ---------------------------------------
+  arm_lift_joint_position:
+    type: position_controllers/JointPositionController
+    joint: arm_shoulder_lift_joint
+
+  arm_shoulder_pan_joint_position:
+    type: position_controllers/JointPositionController
+    joint: arm_shoulder_lift_joint
+
+  arm_upperarm_roll_joint_position:
+    type: position_controllers/JointPositionController
+    joint: arm_upperarm_roll_joint
+
+  arm_elbow_flex_joint_position:
+    type: position_controllers/JointPositionController
+    joint: arm_elbow_flex_joint
+
+  arm_wrist_flex_joint_position:
+    type: position_controllers/JointPositionController
+    joint: arm_wrist_flex_joint
+
+  l_gripper_joint_position:
+    type: position_controllers/JointPositionController
+    joint: l_gripper_joint
+
+  r_gripper_joint_position:
+    type: position_controllers/JointPositionController
+    joint: r_gripper_joint
+
+  # Head Position Controllers ---------------------------------------
+  head_pan_joint_position:
+    type: position_controllers/JointPositionController
+    joint: head_pan_joint
+
+  head_tilt_joint_position
+    type: position_controllers/JointPositionController
+    joint: head_tilt_joint

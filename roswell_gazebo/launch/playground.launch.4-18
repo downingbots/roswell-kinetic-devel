@@ -1,0 +1,52 @@
+<launch>
+
+  <env name="GAZEBO_MODEL_PATH" value="$(find roswell_gazebo)/models:$(optenv GAZEBO_MODEL_PATH)" />
+
+  <arg name="robot" default="roswell"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+
+
+  <!-- Start Gazebo with a blank world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="world_name" value="$(find roswell_gazebo)/worlds/test_zone.sdf"/>
+  </include>
+
+  <!-- Oh, you wanted a robot? -->
+  <include file="$(find roswell_gazebo)/launch/include/fake_roswell.launch.xml" />
+<node pkg="tf" type="static_transform_publisher" name="camera_tf" args="0 0 0 -1.58 0 -1.58 /pioneer3dx_gazebo/base_frame /head_camera/camera_frame 100"/>
+
+<!-- LAUNCH INTERFACE -->
+<!--
+  <joint name="head_camera_frame_joint" type="fixed">
+  <joint name="head_camera_rgb_optical_joint" type="fixed">
+  <link name="head_camera_depth_frame" />
+  <joint name="head_camera_depth_joint" type="fixed">
+  <link name="head_camera_depth_optical_frame" />
+  <joint name="head_camera_depth_optical_joint" type="fixed">
+
+Derived from https://github.com/ros-drivers/openni_camera/issues/46
+
+<node pkg="tf" type="static_transform_publisher" name="hand_camera_calib" args="0.000 -0.020 0.000 0.000 0.000 0.000 1.000 $(arg camera_name)_link $(arg camera_name)/camera_link  100"/>
+<node pkg="tf" type="static_transform_publisher" name="camera_depth_frame" args="0.000 -0.020 0.000 0.000 0.000 0.000 1.000  $(arg camera_name)/camera_link $(arg camera_name)/camera_depth_frame 100"/>
+<node pkg="tf" type="static_transform_publisher" name="camera_depth_optical_frame" args="0.000 -0.020 0.000 -0.500 0.500 -0.500 0.500 $(arg camera_name)/camera_link $(arg camera_name)/camera_depth_optical_frame 100"/>
+<node pkg="tf" type="static_transform_publisher" name="camera_rgb_frame" args="0.000 -0.045 0.000 0.000 0.000 0.000 1.000 $(arg camera_name)/camera_link $(arg camera_name)/camera_rgb_frame 100"/>
+<node pkg="tf" type="static_transform_publisher" name="camera_rgb_optical_frame" args="0.000 -0.045 0.000 -0.500 0.500 -0.500 0.500  $(arg camera_name)/camera_link $(arg camera_name)/camera_rgb_optical_frame 100"/>
+
+<node pkg="tf" type="static_transform_publisher" name="hand_camera_calib" args="0.000 -0.020 0.000 0.000 0.000 0.000 1.000 $(arg camera_name)_link head_camera_link  100"/>
+
+<arg name="camera_name" default="head"/>
+
+<node pkg="tf" type="static_transform_publisher" name="head_camera_depth_frame" args="0.000 -0.020 0.000 0.000 0.000 0.000 1.000  head_camera_depth_frame head_camera_link 100"/>
+
+<node pkg="tf" type="static_transform_publisher" name="head_camera_depth_optical_frame" args="0.000 -0.020 0.000 -0.500 0.500 -0.500 0.500 head_camera_depth_optical_frame head_camera_link 100"/>
+
+-->
+
+</launch>

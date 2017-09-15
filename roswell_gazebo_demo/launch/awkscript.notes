@@ -1,0 +1,133 @@
+------------------
+sudo find . -name
+
+-Bdynamic
+   /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so 
+
+-lboost_iostreams
+-lboost_regex
+-lboost_thread
+-lboost_system
+-lboost_filesystem
+
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name link.txt
+
+------------------------------
+# Make a backup
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt" | awk '{split($1,a,"link.txt"); cmd="cp  "$1" "a[1]"link.txt.bck"; system(cmd) }'
+
+# cp backup to original
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt.bck" | awk '{split($1,a,"link.txt.bck"); cmd="cp  "$1" "a[1]"link.txt"; system(cmd) }'
+
+# modify link.txt files
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_iostreams //g'
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_regex //g'
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_thread //g'
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_filesystem //g'
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs -name "link.txt" -print0 | xargs -0 sed -i 's#-Bdynamic #-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so #'
+
+
+-----------------
+# /home/ros/catkin_ws/build/simple_grasping/CMakeFiles/simple_grasping.dir
+#                           simple_grasping/CMakeFiles/grasp_planner_node.dir
+find /home/ros/catkin_ws/build/simple_grasping -name "link.txt.bck" | awk '{split($1,a,"link.txt.bck"); cmd="cp  "$1" "a[1]"link.txt"; system(cmd) }'
+
+find /home/ros/catkin_ws/build/simple_grasping -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_iostreams //g'
+find /home/ros/catkin_ws/build/simple_grasping -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_regex //g'
+find /home/ros/catkin_ws/build/simple_grasping -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_thread //g'
+find /home/ros/catkin_ws/build/simple_grasping  -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/simple_grasping  -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_filesystem //g'
+find /home/ros/catkin_ws/build/simple_grasping -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/simple_grasping -name "link.txt" -print0 | xargs -0 sed -i 's#-Bdynamic #-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so #'
+
+
+-----------------
+# roboticsgroup_gazebo_plugins-master/CMakeFiles/roboticsgroup_gazebo_disable_link_plugin.dir
+# roboticsgroup_gazebo_plugins-master/CMakeFiles/roboticsgroup_gazebo_mimic_joint_plugin.dir
+
+find /home/ros/catkin_ws/build/roboticsgroup_gazebo_plugins-master -name "link.txt.bck" | awk '{split($1,a,"link.txt.bck"); cmd="cp  "$1" "a[1]"link.txt"; system(cmd) }'
+
+find /home/ros/catkin_ws/build/roboticsgroup_gazebo_plugins-master -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_iostreams //g'
+find /home/ros/catkin_ws/build/roboticsgroup_gazebo_plugins-master -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_regex //g'
+find /home/ros/catkin_ws/build/roboticsgroup_gazebo_plugins-master -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_thread //g'
+find /home/ros/catkin_ws/build/roboticsgroup_gazebo_plugins-master  -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/roboticsgroup_gazebo_plugins-master  -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_filesystem //g'
+find /home/ros/catkin_ws/build/roboticsgroup_gazebo_plugins-master -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/roboticsgroup_gazebo_plugins-master -name "link.txt" -print0 | xargs -0 sed -i 's#-Bdynamic #-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so #'
+
+-----------------
+# pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir
+find /home/ros/catkin_ws/build/pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir -name "link.txt.bck" | awk '{split($1,a,"link.txt.bck"); cmd="cp  "$1" "a[1]"link.txt"; system(cmd) }'
+
+find /home/ros/catkin_ws/build/pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_iostreams //g'
+find /home/ros/catkin_ws/build/pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_regex //g'
+find /home/ros/catkin_ws/build/pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_thread //g'
+find /home/ros/catkin_ws/build/pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir  -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir  -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_filesystem //g'
+find /home/ros/catkin_ws/build/pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/pr2lite_chessbox/pr2lite_chess_perception/CMakeFiles/pr2lite_chess_perception.dir -name "link.txt" -print0 | xargs -0 sed -i 's#-Bdynamic #-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so #'
+
+-----------------
+# robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir -name "link.txt.bck" | awk '{split($1,a,"link.txt.bck"); cmd="cp  "$1" "a[1]"link.txt"; system(cmd) }'
+
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_iostreams //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_regex //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_thread //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir  -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir  -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_filesystem //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel/robot_controllers/CMakeFiles/robot_controllers.dir -name "link.txt" -print0 | xargs -0 sed -i 's#-Bdynamic #-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so #'
+
+-----------------
+# fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir
+find /home/ros/catkin_ws/build/fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir -name "link.txt.bck" | awk '{split($1,a,"link.txt.bck"); cmd="cp  "$1" "a[1]"link.txt"; system(cmd) }'
+
+find /home/ros/catkin_ws/build/fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_iostreams //g'
+find /home/ros/catkin_ws/build/fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_regex //g'
+find /home/ros/catkin_ws/build/fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_thread //g'
+find /home/ros/catkin_ws/build/fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_filesystem //g'
+find /home/ros/catkin_ws/build/fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/fetch_gazebo/fetch_gazebo/CMakeFiles/fetch_gazebo_plugin.dir -name "link.txt" -print0 | xargs -0 sed -i 's#-Bdynamic #-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so #'
+
+-----------------
+# no dynamic in this link file, so do special substitution
+/home/ros/catkin_ws/build/gazebo_ros_pkgs/gazebo_plugins/CMakeFiles/hokuyo_node.dir
+
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs/gazebo_plugins/CMakeFiles/hokuyo_node.dir -name "link.txt" -print0 | xargs -0 sed -i 's#-rpath#-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so -Wl,-rpath#'
+
+# gazebo_ros_pkgs/gazebo_plugins/CMakeFiles/camera_synchronizer.dir
+find /home/ros/catkin_ws/build/gazebo_ros_pkgs/gazebo_plugins/CMakeFiles/camera_synchronizer.dir -name "link.txt" -print0 | xargs -0 sed -i 's#-rpath#-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so -Wl,-rpath#'
+
+-----------------
+# Make backup. No dynamic in this link file, so do special substitution. 
+
+# catkin_ws/build/robot_controllers-indigo-devel
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel -name "link.txt.bck" | awk '{split($1,a,"link.txt.bck"); cmd="cp  "$1" "a[1]"link.txt"; system(cmd) }'
+
+
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_iostreams //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_regex //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_thread //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_filesystem //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/robot_controllers-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's#-rpath #-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so -Wl,-rpath#'
+
+
+---------------------------
+find /home/ros/catkin_ws/build/maxwell-indigo-devel -name "link.txt.bck" | awk '{split($1,a,"link.txt.bck"); cmd="cp  "$1" "a[1]"link.txt"; system(cmd) }'
+
+
+find /home/ros/catkin_ws/build/maxwell-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_iostreams //g'
+find /home/ros/catkin_ws/build/maxwell-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_regex //g'
+find /home/ros/catkin_ws/build/maxwell-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_thread //g'
+find /home/ros/catkin_ws/build/maxwell-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/maxwell-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_filesystem //g'
+find /home/ros/catkin_ws/build/maxwell-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's/-lboost_system //g'
+find /home/ros/catkin_ws/build/maxwell-indigo-devel -name "link.txt" -print0 | xargs -0 sed -i 's#-rpath #-Bdynamic /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so -Wl,-rpath#'
+
+---------------------------

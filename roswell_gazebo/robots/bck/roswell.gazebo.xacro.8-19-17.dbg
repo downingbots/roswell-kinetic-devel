@@ -1,0 +1,23 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="roswell" 
+  filename="$(find roswell_defs)/urdf/roswell.urdf" />
+
+<!--
+  <include find roswell_defs)/urdf/roswell.urdf />
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="roswell"  filename="$(find roswell_defs)/urdf/roswell.urdf" />
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="roswell"  filename="$(find roswell_defs)/urdf/roswell.urdf" />
+
+  filename="$(find roswell_defs)/urdf/roswell.urdf" />
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="roswell" >
+ <include>
+      <uri>model://roswell</uri>
+ </include>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/roswell</robotNamespace>
+    </plugin>
+  </gazebo>
+
+  <include filename="$(find roswell_defs)/urdf/roswell.urdf" />
+-->
+

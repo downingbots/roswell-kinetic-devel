@@ -1,0 +1,5 @@
+<launch>
+
+<rosparam command="load" file="$(find roswell_moveit_config)/config/sensors_asus.yaml" />
+
+</launch>

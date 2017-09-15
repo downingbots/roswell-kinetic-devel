@@ -1,0 +1,38 @@
+<launch>
+
+<!--
+  <include file="$(find roswell_control)/launch/roswell_world.launch" />
+  <include file="$(find roswell_control)/launch/roswell_control.launch" />
+  <include file="$(find roswell_gazebo)/launch/simulation.launch" />
+-->
+
+
+  <!-- Start navigation -->
+  <include file="$(find roswell_gazebo_demo)/launch/roswell_nav.launch" />
+<!--
+-->
+
+  <!-- Start MoveIt -->
+  <!-- publish grasp markers -->
+<!--
+  <include file="$(find roswell_moveit_config)/launch/move_group.launch" >
+-->
+  <include file="$(find roswell_moveit_config)/launch/fake_roswell_move_group.launch" />
+
+  <!-- Start Perception -->
+ <!-- finger tips are 195mm from wrist_roll_link
+         fingers are 60mm deep -->
+<!--
+  <node name="basic_grasping_perception" pkg="simple_grasping" type="basic_grasping_perception" launch-prefix="xterm -e  gdb -ex run - -args" >
+remove space in - -args -->
+  <node name="basic_grasping_perception" pkg="simple_grasping" type="basic_grasping_perception" >
+    <param name="tool_offset" value="0.165" />
+    <param name="finger_depth" value="0.020" />
+    <param name="gripper/gripper_tolerance" value="0.05" />
+    <param name="use_debug" value="true" />
+  </node>
+
+  <!-- Drive to the table, pick stuff up -->
+  <node name="demo" pkg="roswell_gazebo_demo" type="demo.py" output="screen" />
+
+</launch>

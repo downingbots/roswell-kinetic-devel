@@ -1,0 +1,34 @@
+<launch>
+
+  <!-- Maxwell is an awesome mobile manipulator. This launch file 
+       brings a slightly less awesome simulated version of him to life. -->
+
+  <include file="$(find roswell_defs)/launch/upload_roswell.launch" />
+
+  <!-- We are using the gazebo robot_controllers/DiffDriveBaseController
+       not using etherbotix simulation mode -->
+
+  <node name="gripper_controller" pkg="arbotix_controllers" type="parallel_gripper_action_controller.py" output="screen">
+      <param name="pad_width" value="0.0381" />
+      <param name="finger_length" value="0.08255" />
+      <param name="center_left" value="0.18" />
+      <param name="center_right" value="0.18" />
+      <param name="invert_left" value="True" />
+      <param name="gripper_left" value="l_gripper_joint/command" />
+      <param name="gripper_right" value="r_gripper_joint/command" />
+  </node>
+<!-- conflicts with fake_roswell.launch.xml?
+  <node name="statepub" pkg="robot_state_publisher" type="robot_state_publisher" />
+-->
+
+
+  <!-- Monitoring and Diagnostics -->
+  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
+    <rosparam command="load" file="$(find roswell_defs)/params/diagnostics_gazebo.yaml" />
+  </node>
+<!--
+-->
+  <include file="$(find roswell_moveit_config)/launch/fake_roswell_move_group.launch">
+  </include>
+
+</launch>

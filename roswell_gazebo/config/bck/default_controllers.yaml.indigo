@@ -1,0 +1,368 @@
+# ARD: is this used anymore?
+# Looks for moveit. Not for position conrollers.
+arm_controller:
+  follow_joint_trajectory:
+    type: "robot_controllers/FollowJointTrajectoryController"
+    # type: "moveit_fake_controller_manager/MoveItFakeControllerManager"
+    joints:
+      - arm_shoulder_pan_joint
+      - arm_shoulder_lift_joint
+      - arm_upperarm_roll_joint
+      - arm_elbow_flex_joint
+      # arm_forearm_roll_joint
+      - arm_wrist_flex_joint
+      - arm_wrist_roll_joint
+  gravity_compensation:
+    type: "robot_controllers/GravityCompensation"
+    # root: arm_shoulder_pan_servo_link
+    root: "arm_lift_link"
+    tip: "l_gripper_link"
+    autostart: true
+
+arm_with_torso_controller:
+  follow_joint_trajectory:
+    type: "robot_controllers/FollowJointTrajectoryController"
+    # type: "moveit_fake_controller_manager/MoveItFakeControllerManager"
+    joints:
+      - arm_lift_joint
+      - arm_shoulder_pan_joint
+      - arm_shoulder_lift_joint
+      - arm_upperarm_roll_joint
+      - arm_elbow_flex_joint
+      - arm_wrist_flex_joint
+      - arm_wrist_roll_joint
+#  gravity_compensation:
+#    type: "robot_controllers/GravityCompensation"
+    # root: "torso_link"
+#    root: "arm_lift_link"
+#    tip: "l_gripper_link"
+#   autostart: true
+
+torso_controller:
+  follow_joint_trajectory:
+    type: "robot_controllers/FollowJointTrajectoryController"
+    # type: "moveit_fake_controller_manager/MoveItFakeControllerManager"
+    joints:
+      - arm_lift_joint
+#    autostart: true
+#  gravity_compensation:
+#    type: "robot_controllers/GravityCompensation"
+##    # root: "torso_link"
+#    root: "arm_lift_link"
+#    tip: "torso_link"
+#    autostart: true
+
+head_controller:
+  follow_joint_trajectory:
+    type: "robot_controllers/FollowJointTrajectoryController"
+    # type: "moveit_fake_controller_manager/MoveItFakeControllerManager"
+    joints:
+      - head_pan_joint
+      - head_tilt_joint
+  point_head:
+    type: "robot_controllers/PointHeadController"
+
+base_controller:
+    # fetch, maintained by Fergs
+    type: "robot_controllers/DiffDriveBaseController"
+    autostart: true
+    # required to specify as default wheel joint names are not used
+    # joints:
+        # - base_l_wheel_joint
+        # - base_r_wheel_joint
+    l_wheel_joint: "base_l_wheel_joint"
+    r_wheel_joint: "base_r_wheel_joint"
+    # even though track width can be computed, must set here
+    # track width computed by .19304 * 2 
+    # track_width: 0.38608
+    track_width: 0.38608
+    # default: 0.374761 (.18738 * 2)
+    # radians/meter = 1/r = 1 / .06191
+    radians_per_meter: 16.1524794056
+    # Freight:
+    #   max_velocity_x: 2.0
+    #   max_acceleration_x: 1.5
+    #   autostart: true
+    # No defaults:
+    #   track_width max_velocity_x max_velocity_r max_acceleration_x 
+    #   max_acceleration_r angular_velocity_limits_linear_velocity 
+    #   scale_to_wheel_velocity_limits max_wheel_velocity
+    # With defaults:
+    #   radians_per_meter_, 16.5289
+    #   publish_tf_, true);
+    #   odometry_frame" "odom");
+    #   base_frame "base_link");
+    wheel_rotating_threshold: 0.015
+    # wheel_rotating_threshold: 0.05
+    #   wheel_rotating_threshold", 0.001);
+    #   rotating_threshold", 0.05);
+    #   moving_threshold, 0.05);
+
+
+gripper_controller:
+  gripper_action:
+    type: "robot_controllers/ParallelGripperController"
+    centering:
+      p: 1000.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    l_gripper_joint: l_gripper_joint
+    r_gripper_joint: r_gripper_joint
+
+bellows_controller:
+  type: "robot_controllers/ScaledMimicController"
+  mimic_joint: "arm_lift_joint"
+  controlled_joint: "bellows_joint"
+  mimic_scale: 0.5
+  autostart: true
+
+gazebo:
+  default_controllers:
+    - "arm_controller/follow_joint_trajectory"
+    - "arm_controller/gravity_compensation"
+    - "arm_with_torso_controller/follow_joint_trajectory"
+    - "base_controller"
+    - "head_controller/follow_joint_trajectory"
+    - "head_controller/point_head"
+    - "torso_controller/follow_joint_trajectory"
+    - "gripper_controller/gripper_action"
+    # bellows_controller crashes due to boost
+    # - "bellows_controller"
+  base_l_wheel_joint:
+    position:
+      p: 0.0
+      # p: 0.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      # 10000 1000 24 produced interesting results
+      # ARD: next 3 lines from experiments
+      # p: 10000
+      # i: 1000
+      # d: 24
+      # ARD: next 3 lines from fetch
+      # p: 500000.0
+      # i: 0
+      # d: 10
+      # ARD: next 3 lines from fetch default_controller
+      # p: 8.85
+      # i: 0.5
+      # d: 0.0
+    # effort_limit: 8.85
+      # p: 100000
+      # i: 0.0
+      # d: 5
+      # p: 8.85
+      # reducing p; may have factor of 10 less
+      # close, but inconsistent results:
+      # p: 880
+      # i: 503
+      # d: 10
+      #
+      # p: 8784.0
+      # p: 878.4 works too but rotate doesn't stop
+      # p: 879 rotate doesn't stop; consistent?
+      # p: 868.8 sometimes rotates but doesn't stop
+      # p: 868.7 doesn't rotate
+      # i: 503.2 deosn't rotate
+      # p: 879 rotates but doesn't stop
+      # i: 503.15
+      # i: 503.0
+      # d: 10.8
+      # d: 10.81 doesn't rotate
+      # before playing with fricion:
+      # p: 100005
+      # i: 50046.047
+      # d: 1309.85
+      # p: 500000.0
+      # i: 0
+      # d: 10
+      p: 8.85
+      d: 0.0
+      i: 0.5
+      i_clamp: 6.0
+  base_r_wheel_joint:
+    velocity:
+      p: 8.85
+      d: 0.0
+      i: 0.5
+      # p: 500000.0
+      # i: 0
+      # d: 10
+      i_clamp: 6.0
+    # effort_limit: 8.85
+      # ARD: next 3 lines from experiments
+      # p: 10000
+      # i: 1000
+      # d: 24
+      # ARD: next 3 lines from fetch urdf
+      # p: 500000.0
+      # i: 0
+      # d: 10
+      # ARD: next 3 lines from fetch default_controller
+      # p: 8.85
+      # i: 0.5
+      # d: 0.0
+    position:
+      p: 0.0
+      # p: 0.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+#  arm_lift_joint:
+#    position:
+#      p: 100000.0
+#      d: 1000.0
+#      i: 1000.0
+#      i_clamp: 0.0
+#    velocity:
+#      p: 100000.0
+#      d: 1000.0
+#      i: 1000.0
+#      i_clamp: 0.0
+  arm_lift_joint:
+    position:
+      p: 1000.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 100000.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  bellows_joint:
+    position:
+      p: 10.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 25.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  head_pan_joint:
+    position:
+      p: 2.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 2.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  head_tilt_joint:
+    position:
+      p: 10.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 3.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  arm_shoulder_pan_joint:
+    position:
+      p: 100.0
+      d: 0.1
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 200.0
+      d: 0.0
+      i: 2.0
+      i_clamp: 1.0
+  arm_shoulder_lift_joint:
+    position:
+      # p: 500.0
+      # p: 10000.0
+      p: 100.0
+      d: 0.1
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      # p: 500.0
+      # p: 20000.0
+      p: 200.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  arm_upperarm_roll_joint:
+    position:
+      p: 100.0
+      d: 0.1
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      # p: 10.0
+      p: 10.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  arm_elbow_flex_joint:
+    position:
+      # p: 20000.0
+      # p: 500.0
+      p: 100.0
+      d: 0.1
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 150.0
+      # p: 15000.0
+      # p: 500.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  arm_wrist_flex_joint:
+    position:
+      # p: 500.0
+      p: 100.0
+      d: 0.1
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      # p: 500.0
+      p: 100.0
+      # p: 150.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  arm_wrist_roll_joint:
+    position:
+      p: 100.0
+      d: 0.1
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 100.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  l_gripper_joint:
+    position:
+      p: 5000.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 0.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+  r_gripper_joint:
+    position:
+      p: 5000.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 0.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0

@@ -1,0 +1,8 @@
+<launch>
+  <group ns="rtabmap">
+    <!-- Grid map assembler for rviz -->
+    <node pkg="rtabmap_ros" type="grid_map_assembler" name="grid_map_assembler"/>
+  </group>
+
+  <node pkg="rviz" type="rviz" name="rviz"/>
+</launch>

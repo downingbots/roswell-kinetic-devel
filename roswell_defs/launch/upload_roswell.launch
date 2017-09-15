@@ -1,0 +1,8 @@
+<launch>
+    <!-- send roswell urdf to param server -->
+    <param name="$(arg robot_description)" textfile="$(find roswell_defs)/urdf/roswell.urdf"/>
+
+<!--
+    <param name="robot_description" command="rosrun xacro xacro.py '$(find roswell_defs)/urdf/roswell.urdf.xacro'" />
+-->
+</launch>

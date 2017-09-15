@@ -1,0 +1,8 @@
+prefix=/home/ros/catkin_ws/install
+
+Name: roswell_gazebo
+Description: Description of roswell_gazebo
+Version: 0.6.1
+Cflags: -I/home/ros/catkin_ws/install/include
+Libs: -L/home/ros/catkin_ws/install/lib -lroswell_gazebo_plugin
+Requires: control_toolbox gazebo_ros robot_controllers robot_controllers_interface

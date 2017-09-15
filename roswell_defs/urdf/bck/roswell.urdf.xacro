@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="roswell">
+
+  <xacro:property name="arm_height" value="0.7874"/> <!-- deck to arm_link at max height-->
+  <xacro:property name="column_height" value="1.4224" /> <!-- deck to top of 80/20 -->
+  
+  <xacro:include filename="$(find roswell_defs)/urdf/hardware/ax12.xacro" />
+  <xacro:include filename="$(find roswell_defs)/urdf/hardware/rx64.xacro" />
+  <xacro:include filename="$(find roswell_defs)/urdf/sensors/xtion_camera.xacro" />
+  
+  <!-- The following included files set up definitions of parts of the robot body -->
+  <xacro:include filename="$(find roswell_defs)/urdf/roswell_base.urdf.xacro" />
+  <xacro:include filename="$(find roswell_defs)/urdf/torso.urdf.xacro" />
+  <xacro:include filename="$(find roswell_defs)/urdf/roswell_arm.urdf.xacro" />
+  <xacro:include filename="$(find roswell_defs)/urdf/gripper.urdf.xacro" />
+  <xacro:include filename="$(find roswell_defs)/urdf/head.urdf.xacro" />
+  <xacro:include filename="$(find roswell_defs)/urdf/materials.urdf.xacro" />
+
+  <!-- Now we can start using the macros included above to define the actual Maxwell -->
+  <armadillo_base name="base" color="Orange"/>
+
+<!-- ARD: in pr2lite, but not roswell
+  <link name="base_footprint">
+    <visual>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.00889"/>
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="Green"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.00889"/>
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="base_footprint_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.26289"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+  </joint>
+-->
+
+
+  <!-- Add Torso Upright -->
+  <roswell_torso name="torso" parent="base_link">
+    <origin xyz="-0.00635 0 ${base_size_z+arm_height}" rpy="0 0 0"/>
+  </roswell_torso>
+
+  <!-- Live joint between torso and arm -->
+  <joint name="arm_lift_joint" type="prismatic">
+    <axis xyz="0 0 1" />
+    <!--
+    <limit lower="-0.464" upper="0" effort="30" velocity="0.0508"/>
+    -->
+    <limit lower="-0.591" upper="0" effort="30" velocity="0.0508"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="torso_link"/>
+    <child link="arm_lift_link"/>
+  </joint>
+  <link name="arm_lift_link"/>
+
+  <!-- Arm -->
+  <roswell_arm name="arm" parent="arm_lift_link">
+    <origin xyz="0.0611 0 0" rpy="0 0 0"/>
+  </roswell_arm>
+
+  <!-- Gripper -->
+  <roswell_gripper name="gripper" parent="arm_wrist_roll" color="Orange">
+    <origin xyz="0 0 0" rpy="0 0 0" /> 
+  </roswell_gripper>
+
+  <!-- Head -->
+  <roswell_head name="head" parent="torso_link" color="Orange">
+    <origin xyz="0 0 ${column_height-arm_height}" rpy="0 0 0"/>
+  </roswell_head>
+  <xtion_camera name="head_camera" parent="head_tilt_link">
+    <origin xyz="0 0 0.026" rpy="0 0 0"/>
+  </xtion_camera>
+
+</robot>

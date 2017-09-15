@@ -1,0 +1,38 @@
+<launch>
+  <arg name="model" default="roswell" doc="model type [roswell, burger, waffle]"/>
+
+  <arg name="robot" default="roswell"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+
+
+  <!-- Start Gazebo with a blank world -->
+<!--
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="world_name" value="$(find roswell_gazebo)/worlds/test_zone.sdf"/>
+  </include>
+-->
+
+  <include file="$(find roswell_gazebo)/launch/include/fake_roswell.launch.xml" />
+
+<!--
+  <param name="robot_description" command="xacro -inorder $(find roswell_defs)/urdf/roswell.urdf" />
+  <param name="robot_description" command="$(find xacro)/xacro.py $(find roswell_gazebo)/robots/roswell.gazebo.xacro" />
+-->
+
+
+
+<!--
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+    <param name="publish_frequency" type="double" value="50.0" />
+  </node>
+-->
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot3_gazebo)/rviz/turtlebot3_gazebo_model.rviz"/>
+</launch>

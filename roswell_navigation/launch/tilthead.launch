@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="roswell_navigation" type="point_head.py" name="point_head" output="screen">
+  </node>
+  <node pkg="roswell_navigation" type="roswell_tilt_head.py" name="roswell_tilt_head" output="screen">
+  </node>
+</launch>

@@ -1,0 +1,14 @@
+<launch>
+
+  <!-- Run Map Server -->
+  <arg name="map_file" default="$(find roswell_navigation)/maps/my_map.yaml"/>
+
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <include file="$(find roswell_navigation)/launch/include/amcl.launch.xml" />
+  <!--- Run AMCL -->
+  <!--- Run Move Base --> 
+  <include file="$(find roswell_navigation)/launch/include/move_base.launch.xml" />
+
+</launch>

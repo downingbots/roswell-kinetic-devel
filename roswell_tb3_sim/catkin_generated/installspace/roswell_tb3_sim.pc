@@ -1,0 +1,8 @@
+prefix=/home/ros/catkin_ws/install
+
+Name: roswell_tb3_sim
+Description: Description of roswell_tb3_sim
+Version: 0.1.5
+Cflags: -I/home/ros/catkin_ws/install/include
+Libs: -L/home/ros/catkin_ws/install/lib -lroswell_tb3_sim
+Requires: geometry_msgs nav_msgs roscpp sensor_msgs std_msgs tf gazebo_ros

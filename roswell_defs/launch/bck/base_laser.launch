@@ -1,0 +1,10 @@
+<launch>
+
+  <node pkg="urg_node" type="urg_node" name="base_laser_node">
+    <remap from="scan" to="base_scan" />
+    <param name="frame_id" type="string" value="base_laser_link" />
+    <param name="angle_min" type="double" value="-2.2689" />
+    <param name="angle_max" type="double" value="2.2689" />
+  </node>
+
+</launch>

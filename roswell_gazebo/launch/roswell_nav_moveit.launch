@@ -1,0 +1,34 @@
+<launch>
+
+  <arg name="robot" default="roswell"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+
+  <!-- Oh, you wanted a robot? -->
+  <include file="$(find roswell_gazebo)/launch/include/fake_roswell.launch.xml" />
+
+  <!-- why params not getting picked up??? Changed code as workaround. -->
+  <!-- fake node not required for Gazebo? -->
+<!--
+  <node pkg="turtlebot3_fake" type="turtlebot3_fake_node" name="roswell_fake_node" output="screen" >
+    <param name="tb3_model" value="roswell" />
+    <param name="wheel_left_joint_name" value="base_l_wheel_joint" />
+    <param name="wheel_right_joint_name" value="base_r_wheel_joint" />
+  </node>
+-->
+
+  <include file="$(find roswell_navigation)/launch/roswell_nav.launch">
+    <arg name="map_file" value="$(find roswell_gazebo_demo)/maps/test_zone.yaml" />
+  </include>
+
+  <node pkg="tf" type="static_transform_publisher" name="camera_tf" args="0 0 0 -1 .58 0 -1.58 /odom /head_camera/camera_frame 100"/>
+
+  <node name="basic_grasping_perception" pkg="simple_grasping" type="basic_grasping_perception" >
+    <param name="tool_offset" value="0.165" />
+    <param name="finger_depth" value="0.020" />
+    <param name="gripper/gripper_tolerance" value="0.05" />
+    <param name="use_debug" value="true" />
+  </node>
+
+</launch>

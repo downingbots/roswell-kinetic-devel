@@ -1,0 +1,14 @@
+###########################################################
+# This action is called for integrated object detection and
+#  grasp planning, such as in base_grasping_perception
+
+# Set to false to disable grasp planning, returning only the objects found
+bool find_tables
+---
+# Publish convex hull of each table
+# sensor_msgs/PointCloud[] detectedTables
+# sensor_msgs::PointCloud[] detectedTables
+# sensor_msgs::PointCloud2 detectedTables
+# sensor_msgs/Image detectedTables 
+---
+

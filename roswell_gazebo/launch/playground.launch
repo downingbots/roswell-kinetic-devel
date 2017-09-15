@@ -1,0 +1,27 @@
+<launch>
+
+  <env name="GAZEBO_MODEL_PATH" value="$(find roswell_gazebo)/models:$(optenv GAZEBO_MODEL_PATH)" />
+
+  <arg name="robot" default="roswell"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+
+
+  <!-- Start Gazebo with a blank world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="world_name" value="$(find roswell_gazebo)/worlds/test_zone.sdf"/>
+  </include>
+
+  <param name="robot_description" command="$(find xacro)/xacro.py $(find roswell_gazebo)/robots/roswell.gazebo.xacro" />
+  <arg name="x_pos" default="0.0"/>
+  <arg name="y_pos" default="0.0"/>
+  <arg name="z_pos" default="0.0"/>
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model roswell -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+
+</launch>

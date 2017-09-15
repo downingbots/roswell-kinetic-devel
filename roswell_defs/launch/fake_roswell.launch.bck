@@ -1,0 +1,53 @@
+<launch>
+
+  <!-- Maxwell is an awesome mobile manipulator. This launch file 
+       brings a slightly less awesome simulated version of him to life. -->
+
+<!--
+  <param name="/use_sim_time" value="true"/>
+  <param name="l_wheel_joint" value="base_l_wheel_joint"/>
+  <param name="r_wheel_joint" value="base_r_wheel_joint"/>
+-->
+  <include file="$(find roswell_defs)/launch/upload_roswell.launch" />
+
+  <!-- ArbotiX -->
+<!--
+  <node name="etherbotix" pkg="etherbotix_python" type="etherbotix_driver" output="screen">
+  <node name="arbotix" pkg="arbotix_python" type="arbotix_driver" output="screen">
+      <rosparam file="$(find roswell_defs)/params/roswell_gazebo.yaml" command="load" />
+-->
+<!--
+      <rosparam file="$(find roswell_defs)/params/roswell.yaml" command="load" />
+      <param name="sim" value="true"/>
+  </node>
+-->
+<!--
+  <node name="gripper_controller" pkg="arbotix_controllers" type="parallel_gripper_controller.py" output="screen">
+-->
+  <node name="gripper_controller" pkg="arbotix_controllers" type="parallel_gripper_action_controller.py" output="screen">
+      <param name="pad_width" value="0.0381" />
+      <param name="finger_length" value="0.08255" />
+      <param name="center_left" value="0.18" />
+      <param name="center_right" value="0.18" />
+      <param name="invert_left" value="True" />
+      <param name="gripper_left" value="l_gripper_joint/command" />
+      <param name="gripper_right" value="r_gripper_joint/command" />
+  </node>
+<!-- conflicts with fake_roswell.launch.xml?
+  <node name="statepub" pkg="robot_state_publisher" type="robot_state_publisher" />
+-->
+
+
+  <!-- Monitoring and Diagnostics -->
+  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
+    <rosparam command="load" file="$(find roswell_defs)/params/diagnostics_gazebo.yaml" />
+  </node>
+<!--
+-->
+  <include file="$(find roswell_moveit_config)/launch/fake_roswell_move_group.launch">
+  </include>
+<!--
+  <include file="$(find roswell_moveit_config)/launch/demo.launch"/>
+-->
+
+</launch>

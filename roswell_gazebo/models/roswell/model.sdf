@@ -1,0 +1,1204 @@
+<sdf version='1.4'>
+  <model name='roswell'>
+    <link name='base_link'>
+      <pose>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0.103539 0.00268578 0.344237 0 -0 0</pose>
+        <mass>5.71939</mass>
+        <inertia>
+          <ixx>7.82599</ixx>
+          <ixy>-0.00168799</ixy>
+          <ixz>-0.216415</ixz>
+          <iyy>7.84468</iyy>
+          <iyz>-0.0197046</iyz>
+          <izz>2005.22</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>-0.12065 0 0.0655 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.4064 0.4064 0.06</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_base_laser_link'>
+        <pose>0.08 0 0.15 3.1415 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/laser_link.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_head_left_mount_link'>
+        <pose>-0.00635 0.01905 1.5534 0 1.57 0</pose>
+        <geometry>
+          <box>
+            <size>0.0865 0.0047625 0.038</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_head_pan_servo_link'>
+        <pose>-0.0098 0 1.5788 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0501 0.032 0.04</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_head_right_mount_link'>
+        <pose>-0.00635 -0.022225 1.5534 0 1.57 0</pose>
+        <geometry>
+          <box>
+            <size>0.0865 0.0047625 0.038</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_head_tilt_left_side_link'>
+        <pose>-0.01135 -0.0145 1.5788 1.57 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.025 0.038 0.009</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_head_tilt_right_side_link'>
+        <pose>-0.01135 0.0145 1.5788 -1.5708 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.025 0.038 0.009</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_rear_castor_link'>
+        <pose>-0.3 0 0.075 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.105</length>
+            <radius>0.015</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_rear_wheel_link'>
+        <pose>-0.3 0 0.015 0 1.5707 1.5707</pose>
+        <geometry>
+          <sphere>
+            <radius>0.015</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_torso_actuator_link'>
+        <pose>-0.03635 0 0.6734 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.03 0.0254 0.65</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0.0238 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/base.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_base_laser_link'>
+        <pose>0.08 4.63268e-06 0.2 3.1415 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/laser_link.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_head_left_mount_link'>
+        <pose>-0.00635 0.01905 1.5534 1.57159 0.00159265 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/head_mount.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_head_pan_servo_link'>
+        <pose>0.00365 0 1.5788 1.57 -5.55112e-17 1.57</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/ax12.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_head_right_mount_link'>
+        <pose>-0.00635 -0.022225 1.5534 1.57159 0.00159265 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/head_mount.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_head_tilt_left_side_link'>
+        <pose>-0.01135 -0.019 1.5788 1.57 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/F3.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_head_tilt_right_side_link'>
+        <pose>-0.01135 0.019 1.5788 -1.5708 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/F3.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_rear_castor_link'>
+        <pose>-0.3 0 0.075 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.105</length>
+            <radius>0.015</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_rear_wheel_link'>
+        <pose>-0.3 0 0.015 0 1.5707 1.5707</pose>
+        <geometry>
+          <sphere>
+            <radius>0.015</radius>
+          </sphere>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_torso_actuator_link'>
+        <pose>-0.05635 -0.0127 0.3584 0 -0 3.14</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/FA-35-TR.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_torso_link'>
+        <pose>-0.00635 0 0.8422 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0254 0.0254 1.4224</size>
+          </box>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <link name='base_l_wheel_link'>
+      <pose>0 0.19304 0.06191 1.57 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_l_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.02032</length>
+            <radius>0.06191</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='base_l_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.02032</length>
+            <radius>0.06191</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='base_l_wheel_joint' type='revolute'>
+      <child>base_l_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 1 -0.000796327</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='base_r_wheel_link'>
+      <pose>0 -0.19304 0.06191 -1.57 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.03</mass>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_r_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.02032</length>
+            <radius>0.06191</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='base_r_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.02032</length>
+            <radius>0.06191</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='base_r_wheel_joint' type='revolute'>
+      <child>base_r_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 1 0.000796327</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='arm_lift_link'>
+      <pose>-0.00635 0 0.9184 0 -0 0</pose>
+      <inertial>
+        <pose>-0.0051812 -0.000809987 0 0 -0 0</pose>
+        <mass>2.49927</mass>
+        <inertia>
+          <ixx>0.342761</ixx>
+          <ixy>-9.78048e-06</ixy>
+          <ixz>-0.0162001</ixz>
+          <iyy>0.341943</iyy>
+          <iyz>-0.0006</iyz>
+          <izz>0.101942</izz>
+        </inertia>
+      </inertial>
+      <collision name='arm_lift_link_collision_arm_left_mount_link'>
+        <pose>0.03055 0.0230187 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0865 0.0047625 0.038</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_lift_link_collision_arm_right_mount_link'>
+        <pose>0.03055 -0.0230188 -3.7925e-06 3.14 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0865 0.0047625 0.038</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_lift_link_collision_arm_shoulder_pan_servo_link'>
+        <pose>0.04355 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0611 0.042 0.047</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='arm_lift_link_visual_arm_left_mount_link'>
+        <pose>0.01 0.0254 -0.034 -1.57159 0.00159265 -3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/arm_mount.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_lift_link_visual_arm_right_mount_link'>
+        <pose>0.01 -0.0253458 0.034 1.57159 -0.00159265 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/arm_mount.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_lift_link_visual_arm_shoulder_pan_servo_link'>
+        <pose>0.0611 0 0 0 0 -1.57</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/rx64.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='arm_lift_joint' type='prismatic'>
+      <child>arm_lift_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.591</lower>
+          <upper>0</upper>
+          <effort>100</effort>
+          <velocity>0.0508</velocity>
+        </limit>
+        <dynamics>
+          <damping>60</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='arm_shoulder_pan_link'>
+      <pose>0.05475 0 0.9419 0 -0 0</pose>
+      <inertial>
+        <pose>0.0770044 -1.6722e-16 -0.0316185 0 -0 0</pose>
+        <mass>0.338748</mass>
+        <inertia>
+          <ixx>0.00861653</ixx>
+          <ixy>7.17663e-17</ixy>
+          <ixz>-0.00202271</ixz>
+          <iyy>0.00823425</iyy>
+          <iyz>-8.96839e-17</iyz>
+          <izz>0.00614031</izz>
+        </inertia>
+      </inertial>
+      <collision name='arm_shoulder_pan_link_collision'>
+        <pose>0 0 0.005 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.037 0.037 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_shoulder_pan_link_collision_arm_shoulder_lift_servo_link'>
+        <pose>-1.39755e-05 0 0.03505 0 -1.57 0</pose>
+        <geometry>
+          <box>
+            <size>0.0611 0.047 0.042</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='arm_shoulder_pan_link_visual'>
+        <pose>0 0 0 1.57 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/rx64-side-bracket.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_shoulder_pan_link_visual_arm_shoulder_lift_servo_link'>
+        <pose>0 0 0.0526 1.57 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/rx64.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='arm_shoulder_pan_joint' type='revolute'>
+      <child>arm_shoulder_pan_link</child>
+      <parent>arm_lift_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
+          <effort>100</effort>
+          <velocity>0.524</velocity>
+        </limit>
+        <dynamics>
+          <damping>7</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='arm_shoulder_lift_link'>
+      <pose>0.05475 0 0.9945 0 -1.57 0</pose>
+      <inertial>
+        <pose>0.0451688 0.0674308 -0.0769969 0 -0 0</pose>
+        <mass>0.338748</mass>
+        <inertia>
+          <ixx>0.00773056</ixx>
+          <ixy>-0.000594694</ixy>
+          <ixz>-0.000511665</ixz>
+          <iyy>0.00480253</iyy>
+          <iyz>-0.0013218</iyz>
+          <izz>0.00677567</izz>
+        </inertia>
+      </inertial>
+      <collision name='arm_shoulder_lift_link_collision'>
+        <pose>0.0381 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0762 0.053 0.044</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_shoulder_lift_link_collision_arm_upperarm_roll_servo_link'>
+        <pose>0.0712838 -1.73472e-18 0.01755 1.57 1.57 1.39418e-13</pose>
+        <geometry>
+          <box>
+            <size>0.0611 0.047 0.042</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='arm_shoulder_lift_link_visual'>
+        <pose>0 0 0 -1.57 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/sixdof_bracket1.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_shoulder_lift_link_visual_arm_upperarm_roll_servo_link'>
+        <pose>0.0712978 0 0 -1.57239 0.000796961 1.57159</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/rx64.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='arm_shoulder_lift_joint' type='revolute'>
+      <child>arm_shoulder_lift_link</child>
+      <parent>arm_shoulder_pan_link</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.221</lower>
+          <upper>1.518</upper>
+          <effort>131.76</effort>
+          <velocity>1.454</velocity>
+        </limit>
+        <dynamics>
+          <damping>1</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='arm_upperarm_roll_link'>
+      <pose>0.0548068 0 1.0658 -0.784602 -1.56967 0.785398</pose>
+      <inertial>
+        <pose>0.019132 -1.6722e-16 -0.134862 0 -0 0</pose>
+        <mass>0.169374</mass>
+        <inertia>
+          <ixx>0.00331159</ixx>
+          <ixy>-8.9231e-18</ixy>
+          <ixz>-5.38622e-08</ixz>
+          <iyy>0.00174447</iyy>
+          <iyz>-8.06965e-17</iyz>
+          <izz>0.00169418</izz>
+        </inertia>
+      </inertial>
+      <collision name='arm_upperarm_roll_link_collision'>
+        <pose>0.0381 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0762 0.053 0.044</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='arm_upperarm_roll_link_visual'>
+        <pose>0.0869955 0 0 -1.57 -4.33681e-19 3.14</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/sixdof_bracket2.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='arm_upperarm_roll_joint' type='revolute'>
+      <child>arm_upperarm_roll_link</child>
+      <parent>arm_shoulder_lift_link</parent>
+      <axis>
+        <xyz>0.000796327 0.000796326 0.999999</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>76.94</effort>
+          <velocity>1.571</velocity>
+        </limit>
+        <dynamics>
+          <damping>5</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='arm_elbow_flex_link'>
+      <pose>0.0548761 6.92768e-05 1.15279 -0.784602 -1.56967 0.785398</pose>
+      <inertial>
+        <pose>0.0191351 -1.67215e-16 -0.134858 0 -0 0</pose>
+        <mass>0.338758</mass>
+        <inertia>
+          <ixx>1.00662</ixx>
+          <ixy>-1.78464e-17</ixy>
+          <ixz>-2.50496e-07</ixz>
+          <iyy>1.00349</iyy>
+          <iyz>-1.61393e-16</iyz>
+          <izz>1.00339</izz>
+        </inertia>
+      </inertial>
+      <collision name='arm_elbow_flex_link_collision'>
+        <pose>0.01755 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0611 0.047 0.042</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_elbow_flex_link_collision_arm_forearm_link'>
+        <pose>0.0625 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.03 0.053 0.044</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_elbow_flex_link_collision_arm_wrist_flex_servo_link'>
+        <pose>0.10745 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0611 0.047 0.042</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='arm_elbow_flex_link_visual'>
+        <pose>0 0 0 1.57 -1.57 -1.39418e-13</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/rx64.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_elbow_flex_link_visual_arm_forearm_link'>
+        <pose>0 0 0 -1.57 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/arm_mx64_forearm.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_elbow_flex_link_visual_arm_wrist_flex_servo_link'>
+        <pose>0.125 0 0 1.57 1.57 1.39418e-13</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/rx64.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='arm_elbow_flex_joint' type='revolute'>
+      <child>arm_elbow_flex_link</child>
+      <parent>arm_upperarm_roll_link</parent>
+      <axis>
+        <xyz>-0.000796326 0.999999 -0.000795692</xyz>
+        <limit>
+          <lower>-1.57</lower>
+          <upper>2.251</upper>
+          <effort>131.76</effort>
+          <velocity>0.524</velocity>
+        </limit>
+        <dynamics>
+          <damping>7.5</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='arm_wrist_flex_link'>
+      <pose>0.0549756 0.000168818 1.27779 -0.784602 -1.56967 0.785398</pose>
+      <inertial>
+        <pose>0.019132 -1.6722e-16 -0.134862 0 -0 0</pose>
+        <mass>0.169374</mass>
+        <inertia>
+          <ixx>0.00331159</ixx>
+          <ixy>-8.9231e-18</ixy>
+          <ixz>-5.38622e-08</ixz>
+          <iyy>0.00174447</iyy>
+          <iyz>-8.06965e-17</iyz>
+          <izz>0.00169418</izz>
+        </inertia>
+      </inertial>
+      <collision name='arm_wrist_flex_link_collision'>
+        <pose>0.015 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.03 0.056 0.031</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='arm_wrist_flex_link_visual'>
+        <pose>0 0 0 0 0 -1.57</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/rx64-hinge-bracket.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='arm_wrist_flex_joint' type='revolute'>
+      <child>arm_wrist_flex_link</child>
+      <parent>arm_elbow_flex_link</parent>
+      <axis>
+        <xyz>-0.000796326 0.999999 -0.000795692</xyz>
+        <limit>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
+          <effort>30</effort>
+          <velocity>0.785</velocity>
+        </limit>
+        <dynamics>
+          <damping>7</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='arm_wrist_roll_link'>
+      <pose>0.0550082 0.000201467 1.31879 -0.784602 -1.56967 0.785398</pose>
+      <inertial>
+        <pose>0.0580203 3.18779e-05 -0.0093065 0 -0 0</pose>
+        <mass>0.16056</mass>
+        <inertia>
+          <ixx>6.00603</ixx>
+          <ixy>-1.55435e-07</ixy>
+          <ixz>4.3324e-05</ixz>
+          <iyy>6.00628</iyy>
+          <iyz>4.68203e-09</iyz>
+          <izz>6.0063</izz>
+        </inertia>
+      </inertial>
+      <collision name='arm_wrist_roll_link_collision'>
+        <pose>0.01905 0 0 0 -0 1.57</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.032 0.0501</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_wrist_roll_link_collision_gripper_F6_1_link'>
+        <pose>0.02005 0.017 -0.014 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.005 0.024</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_wrist_roll_link_collision_gripper_F6_2_link'>
+        <pose>0.02605 0.021 -0.0140016 -0.00159265 0.00159265 3.14159</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.005 0.024</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_wrist_roll_link_collision_gripper_F6_3_link'>
+        <pose>0.02005 -0.017 -0.014 3.14 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.005 0.024</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_wrist_roll_link_collision_gripper_F6_4_link'>
+        <pose>0.02605 -0.0210016 -0.0139936 -3.14 -2.53654e-06 -3.14</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.005 0.024</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_wrist_roll_link_collision_left_gripper_mount_link'>
+        <pose>0.04955 0.0159964 -0.0139757 1.57159 0.00159392 -1.57159</pose>
+        <geometry>
+          <box>
+            <size>0.025 0.038 0.009</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_wrist_roll_link_collision_left_gripper_servo_link'>
+        <pose>0.0736 0.015988 -0.0139566 0.00239088 -0.000793789 -0.00159138</pose>
+        <geometry>
+          <box>
+            <size>0.0501 0.032 0.04</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_wrist_roll_link_collision_right_gripper_mount_link'>
+        <pose>0.049542 -0.0159606 -0.0139981 -1.57159 0.00159265 1.57319</pose>
+        <geometry>
+          <box>
+            <size>0.025 0.038 0.009</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='arm_wrist_roll_link_collision_right_gripper_servo_link'>
+        <pose>0.073592 -0.0159138 -0.013979 -0.00238961 -0.000791252 0.00318657</pose>
+        <geometry>
+          <box>
+            <size>0.0501 0.032 0.04</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='arm_wrist_roll_link_visual'>
+        <pose>0.01905 0 0 0 -0 1.57</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/ax12.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_wrist_roll_link_visual_gripper_F6_1_link'>
+        <pose>0.01905 0.017 -0.014 3.14 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F6.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_wrist_roll_link_visual_gripper_F6_2_link'>
+        <pose>0.02705 0.021 -0.014 3.13841 0.00159265 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F6.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_wrist_roll_link_visual_gripper_F6_3_link'>
+        <pose>0.01905 -0.017 -0.014 -0.00318531 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F6.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_wrist_roll_link_visual_gripper_F6_4_link'>
+        <pose>0.02705 -0.021 -0.0139936 -2.01992e-09 -2.53654e-06 -3.14</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F6.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_wrist_roll_link_visual_left_gripper_mount_link'>
+        <pose>0.04505 0.016 -0.0139793 1.57159 0.00159392 -1.57159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/F3.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_wrist_roll_link_visual_left_gripper_servo_link'>
+        <pose>0.08705 0.0159666 -0.0139459 1.56921 -0.00239151 1.56841</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/ax12.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_wrist_roll_link_visual_right_gripper_mount_link'>
+        <pose>0.045042 -0.0159713 -0.0140016 -1.57159 0.00159265 1.57319</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/F3.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_wrist_roll_link_visual_right_gripper_servo_link'>
+        <pose>0.0870419 -0.0158709 -0.0139684 1.56921 0.00238898 1.57318</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/ax12.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='arm_wrist_roll_joint' type='revolute'>
+      <child>arm_wrist_roll_link</child>
+      <parent>arm_wrist_flex_link</parent>
+      <axis>
+        <xyz>0.000796327 0.000796326 0.999999</xyz>
+        <limit>
+          <lower>-2.617</lower>
+          <upper>2.617</upper>
+          <effort>30</effort>
+          <velocity>0.785</velocity>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='l_gripper_link'>
+      <pose>0.0690107 0.0162485 1.40582 1.5692 -0.00159202 1.57398</pose>
+      <inertial>
+        <pose>0.0103333 0.021 -5.3068e-19 0 -0 0</pose>
+        <mass>3e-05</mass>
+        <inertia>
+          <ixx>3</ixx>
+          <ixy>-3.255e-09</ixy>
+          <ixz>8.22553e-26</ixz>
+          <iyy>3</iyy>
+          <iyz>6.36815e-26</iyz>
+          <izz>3</izz>
+        </inertia>
+      </inertial>
+      <collision name='l_gripper_link_collision'>
+        <pose>0.01 0.008 0 0 -0 0.8</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.028 0.046</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='l_gripper_link_collision_left_gripper_F9_link'>
+        <pose>0.0235 0.038 1.27412e-05 3.14159 0.00159265 3.14159</pose>
+        <geometry>
+          <box>
+            <size>0.008 0.03 0.024</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='l_gripper_link_collision_left_gripper_finger_link'>
+        <pose>0.0235 0.05 1.27412e-05 3.14159 0.00159265 3.14159</pose>
+        <geometry>
+          <box>
+            <size>0.009 0.06 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='l_gripper_link_visual'>
+        <pose>0 0 0 3.14 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F1.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='l_gripper_link_visual_left_gripper_F9_link'>
+        <pose>0.0155 0.038 0 3.14159 0.00159265 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F9.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='l_gripper_link_visual_left_gripper_finger_link'>
+        <pose>0.0155 0.025 0 3.14159 0.00159265 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F11.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='l_gripper_joint' type='revolute'>
+      <child>l_gripper_link</child>
+      <parent>arm_wrist_roll_link</parent>
+      <axis>
+        <xyz>0.999994 0.00318339 0.00159138</xyz>
+        <limit>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
+          <effort>30</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='r_gripper_link'>
+      <pose>0.0690585 -0.015589 1.40584 1.5708 -0.00477859 -1.57239</pose>
+      <inertial>
+        <pose>0.0103333 0.021 -5.3068e-19 0 -0 0</pose>
+        <mass>3e-05</mass>
+        <inertia>
+          <ixx>3</ixx>
+          <ixy>-3.255e-09</ixy>
+          <ixz>8.22553e-26</ixz>
+          <iyy>3</iyy>
+          <iyz>6.36815e-26</iyz>
+          <izz>3</izz>
+        </inertia>
+      </inertial>
+      <collision name='r_gripper_link_collision'>
+        <pose>0.01 0.008 0 0 -0 0.8</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.028 0.046</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='r_gripper_link_collision_right_gripper_F9_link'>
+        <pose>0.0235 0.038 1.27412e-05 3.14159 0.00159265 3.14159</pose>
+        <geometry>
+          <box>
+            <size>0.008 0.03 0.024</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='r_gripper_link_collision_right_gripper_finger_link'>
+        <pose>0.0235 0.05 1.27412e-05 3.14159 0.00159265 3.14159</pose>
+        <geometry>
+          <box>
+            <size>0.009 0.06 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='r_gripper_link_visual'>
+        <pose>0 0 0 3.14 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F1.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='r_gripper_link_visual_right_gripper_F9_link'>
+        <pose>0.0155 0.038 0 3.14159 0.00159265 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F9.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='r_gripper_link_visual_right_gripper_finger_link'>
+        <pose>0.0155 0.025 0 3.14159 0.00159265 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://roswell/meshes/F11.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='r_gripper_joint' type='revolute'>
+      <child>r_gripper_link</child>
+      <parent>arm_wrist_roll_link</parent>
+      <axis>
+        <xyz>-0.999999 0.00159074 -3.80178e-06</xyz>
+        <limit>
+          <lower>-1.57</lower>
+          <upper>1.57</upper>
+          <effort>30</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>7</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='head_pan_link'>
+      <pose>0.00365 0 1.5978 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0.0414922 0 -0 0</pose>
+        <mass>0.05351</mass>
+        <inertia>
+          <ixx>1.002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.002</iyy>
+          <iyz>0</iyz>
+          <izz>1.002</izz>
+        </inertia>
+      </inertial>
+      <collision name='head_pan_link_collision'>
+        <pose>0 0 0.0045 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.025 0.038 0.009</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='head_pan_link_collision_head_tilt_servo_link'>
+        <pose>0 0 0.02805 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.032 0.04 0.0501</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='head_pan_link_visual'>
+        <pose>0 0 0 3.14 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/F3.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='head_pan_link_visual_head_tilt_servo_link'>
+        <pose>0 0 0.0415 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/ax12.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='head_pan_joint' type='revolute'>
+      <child>head_pan_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.617</lower>
+          <upper>2.617</upper>
+          <effort>30</effort>
+          <velocity>1</velocity>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='head_tilt_link'>
+      <pose>0.00365 0 1.6393 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>1e-05</mass>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+      </inertial>
+      <collision name='head_tilt_link_collision'>
+        <pose>0 0 0.00775 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.025 0.0485 0.0375</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='head_tilt_link_collision_head_camera_link'>
+        <pose>0 0 0.04 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0381 0.179388 0.0254</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='head_tilt_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/F2.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='head_tilt_link_visual_head_camera_link'>
+        <pose>0 0 0.02 0 0 -1.57</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://roswell/meshes/xtion.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='head_tilt_joint' type='revolute'>
+      <child>head_tilt_link</child>
+      <parent>head_pan_link</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.5708</lower>
+          <upper>1.5708</upper>
+          <effort>30</effort>
+          <velocity>1</velocity>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+  </model>
+</sdf>

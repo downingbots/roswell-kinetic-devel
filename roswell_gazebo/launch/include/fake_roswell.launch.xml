@@ -1,0 +1,28 @@
+<launch>
+
+
+  <!-- Setup controllers -->
+  <rosparam file="$(find roswell_gazebo)/config/default_controllers.yaml" command="load" />
+
+  <!-- URDF and TF support -->
+
+  <param name="robot_description" command="$(find xacro)/xacro.py $(find roswell_gazebo)/robots/roswell.gazebo.xacro" />
+
+  <include file="$(find roswell_moveit_config)/launch/fake_roswell_move_group.launch" />
+
+  <!-- Put a robot in gazebo, make it look pretty -->
+  <node name="prepare_robot" pkg="roswell_gazebo" type="prepare_simulated_robot.py" />
+
+  <!-- Give this robot a serial number and version -->
+  <param name="robot/serial" value="ABCDEFGHIJKLMNOPQRSTUVWX" />
+  <param name="robot/version" value="0.0.1" />
+
+  <!-- Head Camera Pipeline -->
+  <include file="$(find roswell_gazebo)/launch/include/head_camera.launch.xml" />
+
+  <!-- Start a mux between application and teleop -->
+  <node pkg="topic_tools" type="mux" name="cmd_vel_mux" respawn="true" args="base_controller/command /cmd_vel /teleop/cmd_vel">
+    <remap from="mux" to="cmd_vel_mux" />
+  </node>
+
+</launch>

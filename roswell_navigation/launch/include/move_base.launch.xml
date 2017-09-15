@@ -1,0 +1,36 @@
+<launch>
+  <!--- 
+  -->
+  <param name="r_wheel_joint" value="base_r_wheel_joint" />
+  <param name="l_wheel_joint" value="base_l_wheel_joint" />
+
+
+  <!-- set topics -->
+  <arg name="name" default="roswell"/>
+  <arg name="map_topic" default="map" />
+  <arg name="cmd_vel_topic" default="cmd_vel" />
+  <arg name="odom_topic" default="odom" />
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+
+    <rosparam file="$(find roswell_navigation)/config/costmap_common.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find roswell_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find roswell_navigation)/config/costmap_local.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find roswell_navigation)/config/costmap_global.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find roswell_navigation)/config/move_base.yaml" command="load" 
+/>
+
+    <!-- roswell-specific values -->
+    <rosparam file="$(find roswell_navigation)/config/$(arg name)/costmap_common.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find roswell_navigation)/config/$(arg name)/costmap_common.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find roswell_navigation)/config/$(arg name)/costmap_local.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find roswell_navigation)/config/$(arg name)/costmap_global.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find roswell_navigation)/config/$(arg name)/move_base.yaml" command="load" />
+
+    <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+    <remap from="odom" to="$(arg odom_topic)"/>
+    <remap from="map" to="$(arg map_topic)" />
+
+  </node>
+</launch>

@@ -1,0 +1,8 @@
+prefix=/home/ros/catkin_ws/install
+
+Name: roswell_moveit_config
+Description: Description of roswell_moveit_config
+Version: 0.2.0
+Cflags: 
+Libs: -L/home/ros/catkin_ws/install/lib 
+Requires: 

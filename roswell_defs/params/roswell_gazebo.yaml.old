@@ -1,0 +1,52 @@
+rate: 100.0
+joints: {
+  head_pan_joint: {type: dynamixel, id: 5},
+  head_tilt_joint: {type: dynamixel, id: 20, invert: true, min_angle: -90, max_angle: 90},
+  # 1024 2048 4096 5120 6144 7168 8192
+  # wasticks: 4096
+  arm_shoulder_pan_joint: {type: dynamixel, id: 8, ticks: 4096, range: 360, max_speed: 30},
+  # arm_shoulder_lift_joint: {type: dynamixel, id: 3, invert: true, ticks: 4096, range: 360, max_speed: 30},
+  arm_shoulder_lift_joint: {type: dynamixel, id: 3, ticks: 4096, range: 360, max_speed: 30},
+  arm_upperarm_roll_joint: {type: dynamixel, id: 4, ticks: 4096, range: 360, max_speed: 30},
+  arm_elbow_flex_joint: {type: dynamixel, id: 6, ticks: 4096, range: 360, max_speed: 30},
+  # arm_wrist_flex_joint: {type: dynamixel, id: 7, invert: true, ticks: 4096, range: 360, max_speed: 45},
+  arm_wrist_flex_joint: {type: dynamixel, id: 7, ticks: 4096, range: 360, max_speed: 45},
+  arm_wrist_roll_joint: {type: dynamixel, id: 18, max_speed: 45},
+  l_gripper_joint: {type: dynamixel, id: 10, max_speed: 10, invert: true},
+  r_gripper_joint: {type: dynamixel, id: 15, max_speed: 10},
+  arm_lift_joint: {type: calibrated_linear, min_position: -0.591, max_position: 0.0, max_speed: 0.0508 }
+}
+
+controllers: {
+  head_controller: {type: follow_controller, joints: [head_pan_joint, head_tilt_joint], action_name: head_controller/follow_joint_trajectory},
+  arm_controller: {type: follow_controller, joints: [arm_shoulder_pan_joint, arm_shoulder_lift_joint, arm_upperarm_roll_joint, arm_elbow_flex_joint, arm_wrist_flex_joint, arm_wrist_roll_joint], action_name: arm_controller/follow_joint_trajectory},
+  arm_with_torso_controller: {type: follow_controller, joints: [arm_lift_joint, arm_shoulder_pan_joint, arm_shoulder_lift_joint, arm_upperarm_roll_joint, arm_elbow_flex_joint, arm_wrist_flex_joint, arm_wrist_roll_joint], action_name: arm_with_torso_controller/follow_joint_trajectory},
+  torso_controller: {type: follow_controller, joints: [arm_lift_joint], action_name: torso_controller/follow_joint_trajectory},
+  #  REX motors: 31750 cpr = 0.3888105m travel
+  #  Tuned/Tested up to 0.5m/s, 2.0rad/s
+  #  Acceleration limits: 0.3m/s^2, 1.5rad/s^2
+
+  base_controller: {type: diff_controller, base_width: 0.381, ticks_meter: 327288, Kp: 1.0, Kd: 0.0, Ki: 0.00 , Kw: 000, accel_limit: 1.0 },
+  # base_controller: {type: DiffDriveBaseController, base_width: 0.381, ticks_meter: 327228, accel_limit: 0.3 , autostart: true},
+  # base_controller: {type: diff_controller, base_width: 0.381, ticks_meter: 327228, Kp: 0.25, Kd: 0.5, Ki: 0.75, Kw: 100, accel_limit: 0.3 },
+  # base_controller: {type: diff_controller, base_width: 0.381, ticks_meter: 327228, Kp: 0.29, Kd: 0.01, Ki: 0.05 , Kw: 000, accel_limit: 0.3 },
+  # base_controller: {type: diff_controller, base_width: 0.381, ticks_meter: 327228, Kp: 0.575, Kd: 0.0, Ki: 0.0, Kw: 800, accel_limit: 0.3 },
+  # base_controller: {type: diff_controller, base_width: 0.381, ticks_meter: 327228, Kp: 1.0, Kd: 0.0, Ki: 0.5, Kw: 800, accel_limit: 0.3 }, 
+  # base_controller: {type: diff_controller, base_width: 0.381, ticks_meter: 327 288, Kp: 1.0, Kd: 0.0, Ki: 0.00 , Kw: 000, accel_limit: 1.0 },
+
+
+  # point of oscillation
+  # base_controller: {type: diff_controller, base_width: 0.381, ticks_meter: 327228, Kp: 1.6, Kd: 0.0, Ki: 0.0 , Kw: 400, accel_limit: 1.0 
+  # cut in half
+  # base_controller: {type: diff_controller, base_width: 0.381, ticks_meter: 327228, Kp: 0.8, Kd: 0.0, Ki: 0.00 , Kw: 400, accel_limit: 1.0 },
+  #  A0 - Lift Direction A
+  #  A1 - Lift Direction B
+  #  D5 - Encoder Pulse
+  #  D7 - Lift PWM
+  # -150 = 15.625" from ground = 0.3960m - 0.0238m (ground clearance) - 0.1310 (base size z) = 0.242m
+  # 0    = 33.875" from ground = 0.8604m
+  # range: 0.4644
+  arm_lift_controller: {type: linear_controller_i, joint: arm_lift_joint, action_name: arm_lift_controller/follow_joint_directory }
+}
+imu: false
+

@@ -1,0 +1,8 @@
+prefix=/home/ros/catkin_ws/install
+
+Name: roswell_navigation
+Description: Description of roswell_navigation
+Version: 0.2.0
+Cflags: -I/home/ros/catkin_ws/install/include
+Libs: -L/home/ros/catkin_ws/install/lib 
+Requires: 

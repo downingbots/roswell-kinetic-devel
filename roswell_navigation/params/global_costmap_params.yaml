@@ -1,0 +1,14 @@
+# ARD gazebo
+global_frame: /map
+robot_base_frame: /base_footprint
+
+update_frequency: 5.0
+publish_frequency: 0.0
+static_map: true
+
+# ARD: Fetch uses osbstacles FetchDepthLayer and not VoxelLayer
+plugins:
+ - {name: static_map, type: "costmap_2d::StaticLayer"}
+ - {name: obstacles,  type: "costmap_2d::VoxelLayer"}
+ - {name: inflater,   type: "costmap_2d::InflationLayer"}
+

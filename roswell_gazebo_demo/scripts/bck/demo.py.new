@@ -1,0 +1,1798 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2015, Fetch Robotics Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of the Fetch Robotics Inc. nor the names of its
+#       contributors may be used to endorse or promote products derived from
+#       this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL FETCH ROBOTICS INC. BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Author: Michael Ferguson
+
+import copy
+import actionlib
+import rospy
+import actionlib_msgs.msg as am
+import tf
+
+from tf.transformations import euler_from_quaternion
+from math import sin, cos, atan2
+from moveit_python import (MoveGroupInterface,
+                           PlanningSceneInterface,
+                           PickPlaceInterface)
+from moveit_python.geometry import rotate_pose_msg_by_euler_angles
+
+from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
+from control_msgs.msg import PointHeadAction, PointHeadGoal
+from grasping_msgs.msg import FindGraspableObjectsAction, FindGraspableObjectsGoal, FindTablesAction, FindTablesGoal
+from geometry_msgs.msg import PoseStamped
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from nav_msgs.msg import Odometry
+from vectors import *
+
+
+# We always import roslib, and load the manifest to handle dependencies
+# import roslib; roslib.load_manifest('mini_max_tutorials')
+
+# recall: robots generally take base movement commands on a topic 
+#  called "cmd_vel" using a message type "geometry_msgs/Twist"
+from geometry_msgs.msg import Twist
+
+# twist_move does primitive movements based on deadreconning only (no sensors)
+class twist_moves:
+    """ This example is in the form of a class. """
+
+    def __init__(self):
+        """ This is the constructor of our class. """
+        # register this function to be called on shutdown
+        rospy.on_shutdown(self.stop_twist)
+
+        # publish to cmd_vel
+        # self.pub = rospy.Publisher('/teleop/cmd_vel', Twist, queue_size=10)
+        self.pub = rospy.Publisher('/base_controller/command', Twist, queue_size=10)
+        # give our node/publisher a bit of time to connect
+        rospy.loginfo("twist_moves: sleep(1)...")
+        rospy.sleep(1)
+
+        # use a rate to make sure the bot keeps moving
+        r = rospy.Rate(5.0)
+
+        # go forever!
+        # self.square_forever()
+
+    # deadreconning
+    def square_forever(self):
+        r = rospy.Rate(5.0)
+        while not rospy.is_shutdown():
+          for s in range(4):         # 10*5hz = 2sec
+            # create a Twist message, fill it in to drive forward
+            rospy.loginfo("twist_moves: drive fwd...")
+            twist = Twist()
+            twist.linear.x = 0.15
+            for i in range(10):         # 10*5hz = 2sec
+                self.pub.publish(twist)
+                r.sleep()
+            # create a twist message, fill it in to turn
+            rospy.loginfo("twist_moves: twist...")
+            twist = Twist()
+            twist.angular.z = 1.57/8    # 90 deg/ 8s * 8sec = 90 degrees
+            for i in range(5 * 8):
+                self.pub.publish(twist)
+                r.sleep()
+            # self.stop_twist()
+
+    # deadreconning
+    def rotate_once(self):
+        r = rospy.Rate(5.0)
+        rospy.loginfo("rotate once to start localization...")
+        twist = Twist()
+        twist.angular.z = 1.57/8    # 90 deg/ 8s * 8sec = 90 degrees
+        # 4 times * 5 hz * 8 sec * (90 deg / 8)
+        maxtab = 0
+        for i in range(4 * 5 * 18):
+          self.pub.publish(twist)
+          r.sleep()
+
+    # deadreconning
+    def nav_to_table_no_slam(self):
+        r = rospy.Rate(5.0)
+        rospy.loginfo("drive directly to table...")
+        twist = Twist()
+        twist.angular.z = 1.57/8    # 90 deg/ 8s * 8sec = 90 degrees
+        maxtab = 0
+        for i in range(20 * 3):
+          self.pub.publish(twist)
+          r.sleep()
+          if i%10 == 0 or maxtab > 0:
+            grasping_client.lookForTable()
+            if maxtab < self.table:
+              maxtab = self.table
+            elif maxtab > self.table:
+              stop_twist()
+              break
+        # self.stop_twist()
+        rospy.loginfo("twist_moves: drive fwd...")
+        twist = Twist()
+        twist.linear.x = 0.15
+        for i in range(10*12):         # 10*5hz = 2sec
+           self.pub.publish(twist)
+           r.sleep()
+           if i%10 == 0:
+             grasping_client.lookForTable()
+             # cube, grasps = grasping_client.getTable()
+        # self.stop_twist()
+
+
+    # deadreconning
+    def rotate_forever(self):
+        r = rospy.Rate(5.0)
+        rospy.loginfo("rotate forever...")
+        twist = Twist()
+        twist.angular.z = 1.57/8    # 90 deg/ 8s * 8sec = 90 degrees
+        while not rospy.is_shutdown():
+          self.pub.publish(twist)
+          r.sleep()
+        # self.stop_twist()
+
+    # deadreconning
+    def hall_forever(self):
+        rospy.loginfo("hall forever...")
+        r = rospy.Rate(5.0)
+        while not rospy.is_shutdown():
+          twist = Twist()
+          twist.angular.z = 1.57/8    # 90 deg/ 8s * 8sec = 90 degrees
+          rospy.loginfo("twist_moves: turn 180 degrees...")
+          for i in range(10 * 8):      
+            self.pub.publish(twist)
+            r.sleep()
+          # self.stop_twist()
+          rospy.loginfo("twist_moves: drive fwd...")
+          twist = Twist()
+          twist.linear.x = .15
+          twist.angular.z = 0
+          for i in range(80):         
+            self.pub.publish(twist)
+            r.sleep()
+        # stop the robot!
+        twist = Twist()
+        self.pub.publish(twist)
+
+    # deadreconning
+    def stop_twist(self):
+        r = rospy.Rate(5.0)
+        # rospy.loginfo("stop via direcion change...")
+        twist = Twist()
+        for i in range(5):      
+          twist.angular.z = 0
+          self.pub.publish(twist)
+          r.sleep()
+        rospy.loginfo("not moving?")
+
+    # deadreconning
+    def twist_heading(self, th):
+        r = rospy.Rate(5.0)
+        twist = Twist()
+        if th < -1.57/8: 
+          twist.angular.z = -1.57/8    # 90 deg/ 8s * 8sec = 90 degrees
+        elif th > 1.57/8: 
+          twist.angular.z = 1.57/8    # 90 deg/ 8s * 8sec = 90 degrees
+        else:
+          twist.angular.z = th
+        self.pub.publish(twist)
+        rospy.loginfo("angular z %f", twist.angular.z)
+        r.sleep()
+
+#
+# SimpleNav uses multiple sensor callbacks that check for obstacles and odom
+#
+class SimpleNav(object):
+
+    # MATH FUNCTIONS to calculate distances
+    def ccw(A,B,C):
+        return (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x)
+
+    # Return true if line segments AB and CD intersect
+    def intersect(A,B,C,D):
+        return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
+
+ 	
+    # Given a line with coordinates 'start' and 'end' and the
+    # coordinates of a point 'pnt' the proc returns the shortest 
+    # distance from pnt to the line and the coordinates of the 
+    # nearest point on the line.
+    #
+    # 1  Convert the line segment to a vector ('line_vec').
+    # 2  Create a vector connecting start to pnt ('pnt_vec').
+    # 3  Find the length of the line vector ('line_len').
+    # 4  Convert line_vec to a unit vector ('line_unitvec').
+    # 5  Scale pnt_vec by line_len ('pnt_vec_scaled').
+    # 6  Get the dot product of line_unitvec and pnt_vec_scaled ('t').
+    # 7  Ensure t is in the range 0 to 1.
+    # 8  Use t to get the nearest location on the line to the end
+    #    of vector pnt_vec_scaled ('nearest').
+    # 9  Calculate the distance from nearest to pnt_vec_scaled.
+    # 10 Translate nearest back to the start/end line. 
+    # Malcolm Kesson 16 Dec 2012
+      
+    def pnt2line(pnt, start, end):
+        line_vec = vector(start, end)
+        pnt_vec = vector(start, pnt)
+        line_len = length(line_vec)
+        line_unitvec = unit(line_vec)
+        pnt_vec_scaled = scale(pnt_vec, 1.0/line_len)
+        t = dot(line_unitvec, pnt_vec_scaled)    
+        if t < 0.0:
+            t = 0.0
+        elif t > 1.0:
+            t = 1.0
+        nearest = scale(line_vec, t)
+        dist = distance(nearest, pnt_vec)
+        nearest = add(nearest, start)
+        return(dist, nearest)
+
+
+# *
+# * Explore until find table
+# *    - move arm to top height? Above table?
+# *    - rotate towards center point on table convex hull using vision only
+# *    - scan path to closest convex point to centerpoint for clear path 
+# *    - if straight path, go straight forward using SLAM
+# *        - keep looking at center of table
+# *        - if stray from path so different closest convex point, 
+# *          stop and rotate
+# * 
+# * Go towards closest point on table until max sized convex hull found
+# *    - look at table as you go. ensure arm still above table
+# *    - aim for middle of convex hull
+# *    - look for cube on table as you go
+# *    - if no cube and next to table, scan table
+# *       - if no cube, explore some more
+# * 
+# * Find cube:
+# *    - find closest point on convex hull to cube (may be between points)
+# *       - at right angles
+# *    - find line segment from robot to cube table edge
+# *    - see if convext hull consecutive points intersect robot-cube line segment
+# *    - If intersect, find closest convex point (by circumference)
+# *      to cube that has no intersect line segment, go to that point
+# *    - save convex hull with biggest area of max-min X*Y
+# *         - save height
+# * 
+# * Go toward closest point
+# *    - get no closer than obstacle_dist_
+# *    - follow convex hull points - with padding for obstacle_dist_
+# *    - check focus on ground to ensure clear path
+# *    - check if any table height obstacle. If so, stop and add to padding 
+# * 
+# * When at closest convex hull point
+# *    - look towards table
+# *    - scan table top to find cube
+# *    - find table point closest to cube
+# *    - confirm that closest convex hull point
+# *    - or go to that point
+# *    - rotate towards cube
+# *    - inch forward until almost touching table
+# * 
+# * Pick up cube
+# *    - verify that cube is being held
+# * 
+# * Find for box on table.
+# *   - follow convex hull to box -> same algorithm to cube
+# * 
+# * Place cube in box
+# */
+#
+#
+#    /*
+#     * Explore until find table
+#     *    - move arm to top height? Above table?
+#     *    - rotate towards center point on table convex hull using vision only
+#     *    - scan path to closest convex point to centerpoint for clear path
+#     *    - if straight path, go straight forward using SLAM
+#     *        - keep looking at center of table
+#     *        - if stray from path so different closest convex point, 
+#     *          stop and rotate
+#     */
+    def Find_Table(self):
+      # SCAN_FOR_TABLE
+      grasping_client = GraspingClient()
+      # Setup clients
+      move_base_ = MoveBaseClient()
+      torso_action_ = TorsoClient()
+      head_action_ = PointHeadClient()
+      grasping_client_ = GraspingClient()
+      tw_ = twist_moves()
+      rospy.loginfo("Raising torso 0...")
+      torso_action.move_to(0.0)
+      best_tab = 0;
+      best_x = 0;
+      best_y = 0;
+      # scan_for_table()
+      for x in range(8):
+        for y in range(8):
+          head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+          conv_hull = grasping_client.lookForTable()
+          # for (all conv_hull)
+            # find x/y/z centroid
+            # add x/y/z values up and divide by # vals
+            
+            # get the min/max x/y
+
+            # store with table metadata
+
+            # compute above using PCL C functions and return them
+
+            # go towards the centroid
+          # if (tab_val > best_tab) 
+            # best_tab = tab_val
+            # best_x = 7.5 - x / 2.0
+            # best_y = 7.5 - y / 2.0
+      
+      head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+      tab_val = grasping_client.lookForTable()
+      head_action.look_at(self.tab.centroid.x, self.tab.controid.y, 0.0, "map")
+      # -- add filtered_cloud_topic to roswell_moveit_config/config/sensors.yaml
+      # Octomap provides a projected 2d map through the topic "projected_map". I want to save this map. The map server is also running. So i remapped the topic in the octomap server launch file : <remap from="map" to="projected_map"/>
+  
+      # head_action.verify_clear_path()
+  
+      # ROTATE_TO_TABLE
+
+      # VALIDATE_CLEAR_PATH
+ 
+
+      # def validate_clear_path(self, from_x, from_y, to_x, to_y):
+
+
+    # by odom
+    def stop_rotate(self):
+        tw = twist_moves()
+        twist_again = True
+        # ensure not moving
+        prev_x = 100000000
+        prev_y = 100000000
+        while self.latch_ or self.odom_msg_cnt_ < 2:
+          rospy.sleep(1)
+        cur_x = self.cur_odom_msg_.pose.pose.position.x
+        cur_y = self.cur_odom_msg_.pose.pose.position.y
+        cur_odom_msg = self.odom_msg_cnt_
+        while prev_x!=cur_x or prev_y!=cur_y:
+          if cur_odom_msg>self.odom_msg_cnt_-10:
+            rospy.sleep(1)
+            continue
+          tw.twist_heading(0.0)
+          rospy.sleep(1)
+          prev_x = cur_x
+          prev_y = cur_y
+          cur_odom_msg = self.msg_odom_cnt_
+          cur_x = self.cur_odom_msg_.pose.pose.position.x
+          cur_y = self.cur_odom_msg_.pose.pose.position.y
+          rospy.loginfo("try to stop: x %f y %f", cur_x, cur_y)
+
+
+    # by odom only
+    # problem when odometry current position is not correct
+    def rotate_towards(self, des_x, des_y):
+        rospy.loginfo("rotate_towards")
+        tw = twist_moves()
+        twist_again = True
+        self.stop_rotate() # ensure not moving
+        twist_again = True
+        while twist_again:
+          while self.latch_ or self.msg_cnt_ < 2:
+            rospy.sleep(1)
+          self.latch_ = True;
+          # (roll, pitch, yaw) = tf.transformations.euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+          (roll, pitch, prev_th) = tf.transformations.euler_from_quaternion([self.prev_msg_.pose.pose.orientation.x,self.prev_msg_.pose.pose.orientation.y,self.prev_msg_.pose.pose.orientation.z,self.prev_msg_.pose.pose.orientation.w])
+          (roll, pitch, cur_th) = tf.transformations.euler_from_quaternion([self.cur_odom_msg_.pose.pose.orientation.x,self.cur_odom_msg_.pose.pose.orientation.y,self.cur_odom_msg_.pose.pose.orientation.z,self.cur_odom_msg_.pose.pose.orientation.w])
+          cur_x = self.cur_odom_msg_.pose.pose.position.x
+          cur_y = self.cur_odom_msg_.pose.pose.position.y
+          des_th = atan2((des_y-cur_y),(des_x-cur_x))
+          # des_th = atan2((des_x-cur_x),(des_y-cur_y))
+
+          # if self.prev_msg_ == self.cur_odom_msg_ and cur_th == des_th:
+          rospy.loginfo("x %f y %f th %f des_th %f dif %f", cur_x, cur_y, cur_th, des_th, des_th - cur_th)
+          if abs(cur_th - des_th) < .06 and self.prev_th_ == cur_th and self.odom_msg_cnt_ - cnt >= 10:
+            self.latch_ = False
+            twist_again = False
+            rospy.loginfo("Rotation complete")
+            continue
+          if abs(cur_th - des_th) < .06 and self.prev_th_ == cur_th and cnt == 10000000000000000:
+            cnt = self.odom_msg_cnt_ 
+            rospy.sleep(5)
+          else:
+            cnt = 10000000000000000
+          self.latch_ = False
+          self.prev_th_ = cur_th
+          if abs(cur_th - des_th) < .06:
+            tw.twist_heading(0.0)
+          else:
+            tw.twist_heading(des_th - cur_th)
+        self.stop_rotate() # ensure not moving
+
+#    def __init__(self, self.use_odom_, self.use_lidar_, self.use_ptcloud_):
+#        # rospy.init_node('heading client', anonymous=True) #make node 
+#        if self.use_odom_:
+#          rospy.Subscriber('odom',Odometry, self.odometryCb)
+#        if self.use_lidar_:
+#          rospy.Subscriber('base_scan',LaserScan, self.odometryCb)
+#        if self.use_ptCloud_:
+#          rospy.Subscriber('/head_camera/depth_registered/points',PointCloud2, self.ptCloudCb)
+#        self.latch_ = False
+#        self.odom_msg_cnt_ = 0
+#        self.prev_th_ = 5000  # not within legal range
+#        self.obstacle_dist = .3
+        
+# Move base using navigation stack odometry
+class MoveBaseClient(object):
+
+    def __init__(self):
+        self.client = actionlib.SimpleActionClient("move_base", MoveBaseAction)
+        rospy.loginfo("Waiting for move_base...")
+        self.client.wait_for_server()
+        rospy.loginfo("OK for move_base...")
+        self.pub = rospy.Publisher('/base_controller/command', Twist, queue_size=30)
+        # give our node/publisher a bit of time to connect
+        rospy.loginfo("Waiting for base_controller...")
+        rospy.sleep(1)
+
+    def stop_twist(self):
+        twist = Twist()
+        rospy.loginfo("stop via direcion change...")
+        for s in range(4):         # 10*5hz = 2sec
+          # twist.linear.x = -0.00001
+          twist.angular.z = 0
+          self.pub.publish(twist)
+          rospy.sleep(1)
+
+    # def twist_towards(self, x, y)
+
+
+    # odom only
+    def goto(self, x, y, theta, frame="map"):
+      compute_goal = True
+      hc = HeadingClient()
+      # hc.rotate_towards(x,y)
+      while compute_goal:
+        move_goal = MoveBaseGoal()
+        move_goal.target_pose.pose.position.x = x
+        move_goal.target_pose.pose.position.y = y
+        move_goal.target_pose.pose.orientation.z = sin(theta/2.0)
+        move_goal.target_pose.pose.orientation.w = cos(theta/2.0)
+        move_goal.target_pose.header.frame_id = frame
+        move_goal.target_pose.header.stamp = rospy.Time.now()
+
+        # TODO wait for things to work
+        # gid = self.client.send_goal(move_goal)
+        self.client.send_goal(move_goal)
+        rospy.loginfo("send goal for move_base: x %f, y %f, theta %f" %(x, y, theta))
+        # self.client.wait_for_result()
+        # self.client.wait_for_result(rospy.Duration(125.0))
+        self.client.wait_for_result(rospy.Duration(30.0))
+
+        if (self.client.get_state() != am.GoalStatus.SUCCEEDED):
+          compute_goal = True
+          self.client.cancel_goal()
+          # tw.stop_twist()
+          hc.rotate_towards(x,y)
+          # tw.stop_twist()
+          rospy.loginfo("recompute move_base...")
+          # self.client.goto(x, y, theta, frame)
+        else:
+          compute_goal = False
+          # tw.stop_twist()
+      rospy.loginfo("move_base success...")
+
+# Send a trajectory to controller
+class TorsoClient(object):
+
+    def __init__(self):
+        self.client = actionlib.SimpleActionClient("torso_controller/follow_joint_trajectory",
+                                                   FollowJointTrajectoryAction)
+        rospy.loginfo("Waiting for torso_controller")
+        self.client.wait_for_server()
+        rospy.loginfo("Waiting complete for torso_controller")
+
+    def move_to(self, position, duration=15.0):
+        # trajectory = JointTrajectory()
+        # trajectory.joint_names = ["arm_lift_joint",]
+        # trajectory.points.append(JointTrajectoryPoint())
+        # trajectory.points[0].positions = [position, ]
+        # trajectory.points[0].velocities = [0.0,]
+        # trajectory.points[0].accelerations = [0.0,]
+        # trajectory.points[0].time_from_start = rospy.Duration(duration)
+        # follow_goal = FollowJointTrajectoryGoal()
+        # follow_goal.trajectory = trajectory
+        torso_goal = FollowJointTrajectoryGoal()
+        torso_point = JointTrajectoryPoint()
+        torso_point.positions = [position,]
+        torso_point.velocities = [0.0,]
+        torso_point.accelerations = [0.0,]
+        torso_point.time_from_start = rospy.Duration(duration)
+        torso_goal.trajectory.points.append(torso_point)
+        torso_goal.trajectory.header.stamp = rospy.Time.now()
+        torso_goal.trajectory.joint_names = ["arm_lift_joint",]
+
+        self.client.send_goal(torso_goal)
+        rospy.loginfo("moveto goal")
+        self.client.wait_for_result(rospy.Duration(duration))
+        rospy.loginfo("moveto done")
+
+    def tuck_arm(self, duration=15.0):
+        torso_goal = FollowJointTrajectoryGoal()
+        torso_point = JointTrajectoryPoint()
+        torso_point.positions = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        torso_point.velocities = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        torso_point.accelerations = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        torso_point.time_from_start = rospy.Duration(duration)
+        torso_goal.trajectory.points.append(torso_point)
+        torso_goal.trajectory.header.stamp = rospy.Time.now()
+        torso_goal.trajectory.joint_names = ["arm_lift_joint","arm_shoulder_pan_joint","arm_shoulder_lift_joint","arm_upperarm_roll_joint","arm_elbow_flex_joint","arm_wrist_flex_joint","arm_wrist_roll_joint"]
+
+        self.client.send_goal(torso_goal)
+        rospy.loginfo("moveto goal")
+        self.client.wait_for_result(rospy.Duration(duration))
+        rospy.loginfo("moveto done")
+
+
+# Point the head using controller
+class PointHeadClient(object):
+    def __init__(self):
+        self.client = actionlib.SimpleActionClient("head_controller/point_head", PointHeadAction)
+        rospy.loginfo("Waiting for head_controller...")
+        self.client.wait_for_server()
+        rospy.loginfo("Waiting for head_controller complete...")
+        self.pan_tilt_client = actionlib.SimpleActionClient(
+                                     "head_controller/follow_joint_trajectory",
+                                     FollowJointTrajectoryAction)
+        rospy.loginfo("Waiting for pan-tilt head_controller...")
+        self.pan_tilt_client.wait_for_server()
+        rospy.loginfo("Waiting for pan-tilt head_controller complete...")
+
+
+    def look_at(self, x, y, z, frame, duration=5.0):
+        goal = PointHeadGoal()
+        goal.target.header.stamp = rospy.Time.now()
+        goal.target.header.frame_id = frame
+        goal.target.point.x = x
+        goal.target.point.y = y
+        goal.target.point.z = z
+        goal.min_duration = rospy.Duration(duration)
+        self.client.send_goal(goal)
+        rospy.loginfo("look_at goal %f %f" % (x, y))
+        self.client.wait_for_result(rospy.Duration(5.0))
+        rospy.loginfo("look_at done")
+   
+    def pan_tilt(self, pan, tilt):
+        duration = 5
+        trajectory = JointTrajectory()
+        trajectory.joint_names = ["head_pan_joint", "head_tilt_joint"]
+        trajectory.points.append(JointTrajectoryPoint())
+        trajectory.points[0].positions = [pan, tilt]
+        trajectory.points[0].velocities = [0.0, 0.0]
+        trajectory.points[0].accelerations = [0.0, 0.0]
+        trajectory.points[0].time_from_start = rospy.Duration(duration)
+        follow_goal = FollowJointTrajectoryGoal()
+        follow_goal.trajectory = trajectory
+        self.pan_tilt_client.send_goal(follow_goal)
+        rospy.loginfo("pan_tilt goal")
+        self.pan_tilt_client.wait_for_result(rospy.Duration(5.0))
+        rospy.loginfo("pan_tilt done")
+
+        
+
+#    def verify_clear_path
+#
+#   
+#    def move_next_to_table
+#    def rotate_to_cube
+#    def rotate_to_box
+#
+#    def find_cube_on_table
+#
+#
+#    def find_box_on_table
+#
+#    def follow_table_edge
+#    
+#    def drive_to_cube
+#
+#    def drive_to_box
+
+# Tools for grasping
+class NavigateClient(object):
+    # def __init__(self):
+
+    def scan_for_table():
+        # Move the base to be in front of the table
+        # Demonstrates the use of the navigation stack
+        # Orig:
+        #   move_base.goto(2.250, 3.118, 0.0)
+        best_tab = 0;
+        best_x = 0;
+        best_y = 0;
+        # scan_for_table()
+        for x in range(8):
+          for y in range(8):
+            self.head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+            if (tab_val > best_tab):
+              best_tab = tab_val
+              best_x = 7.5 - x / 2.0
+              best_y = 7.5 - y / 2.0
+
+        self.head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+        tab_val = self.grasping_client.lookForTable()
+        self.head_action.look_at(self.tab.centroid.x, self.tab.controid.y, 0.0, "map")
+
+
+# Tools for grasping
+class GraspingClient(object):
+
+    def __init__(self):
+        self.scene = PlanningSceneInterface("base_link")
+        self.pickplace = PickPlaceInterface("arm", "gripper", verbose=True)
+        self.move_group = MoveGroupInterface("arm", "base_link")
+
+        find_topic = "basic_grasping_perception/find_objects"
+        rospy.loginfo("Waiting for %s..." % find_topic)
+        self.find_client = actionlib.SimpleActionClient(find_topic, FindGraspableObjectsAction)
+        self.find_client.wait_for_server(rospy.Duration(5.0))
+        find_table_topic = "basic_grasping_perception/find_tables"
+        rospy.loginfo("Waiting for %s..." % find_table_topic)
+        self.find_table_client = actionlib.SimpleActionClient(find_table_topic, FindTablesAction)
+        self.find_table_client.wait_for_server(rospy.Duration(5.0))
+        rospy.loginfo("Waiting for %s complete..." % find_table_topic)
+
+    def updateScene(self):
+        # find objects
+        goal = FindGraspableObjectsGoal()
+        goal.plan_grasps = True
+        self.find_client.send_goal(goal)
+        self.find_client.wait_for_result(rospy.Duration(5.0))
+        find_result = self.find_client.get_result()
+
+        # remove previous objects
+        for name in self.scene.getKnownCollisionObjects():
+            self.scene.removeCollisionObject(name, False)
+        for name in self.scene.getKnownAttachedObjects():
+            self.scene.removeAttachedObject(name, False)
+        rospy.loginfo("Waiting for sync")
+        self.scene.waitForSync()
+
+        # insert objects to scene
+        idx = -1
+        for obj in find_result.objects:
+            idx += 1
+            obj.object.name = "object%d"%idx
+            self.scene.addSolidPrimitive(obj.object.name,
+                                         obj.object.primitives[0],
+                                         obj.object.primitive_poses[0],
+                                         wait = False)
+        rospy.loginfo("number of objects found: %d", idx)
+
+        for obj in find_result.support_surfaces:
+            # extend surface to floor, and make wider since we have narrow field of view
+            height = obj.primitive_poses[0].position.z
+            obj.primitives[0].dimensions = [obj.primitives[0].dimensions[0],
+                                            1.5,  # wider
+                                            obj.primitives[0].dimensions[2] + height]
+            obj.primitive_poses[0].position.z += -height/2.0
+
+            # add to scene
+            self.scene.addSolidPrimitive(obj.name,
+                                         obj.primitives[0],
+                                         obj.primitive_poses[0],
+                                         wait = False)
+
+        self.scene.waitForSync()
+
+        # store for grasping
+        self.objects = find_result.objects
+
+    def getGraspableCube(self):
+        graspable = None
+        for obj in self.objects:
+            # need grasps
+            if len(obj.grasps) < 1:
+                rospy.loginfo("no object.")
+                continue
+            # check size
+	    rospy.loginfo("object dimension: %f", obj.object.primitives[0].dimensions[0])
+            if obj.object.primitives[0].dimensions[0] < 0.05 or \
+               obj.object.primitives[0].dimensions[0] > 0.07 or \
+               obj.object.primitives[0].dimensions[0] < 0.05 or \
+               obj.object.primitives[0].dimensions[0] > 0.07 or \
+               obj.object.primitives[0].dimensions[0] < 0.05 or \
+               obj.object.primitives[0].dimensions[0] > 0.07:
+                continue
+            # has to be on table
+            if obj.object.primitive_poses[0].position.z < 0.5:
+	        rospy.loginfo("object z dimension: %f", obj.object.primitive_poses[0].position.z)
+                continue
+            return obj.object, obj.grasps
+        # nothing detected
+	rospy.loginfo("nothing detected")
+        return None, None
+
+    def lookForTable(self):
+        # find objects
+        goal = FindTablesGoal()
+        self.find_table_client.send_goal(goal)
+        self.find_table_client.wait_for_result(rospy.Duration(5.0))
+        find_result = self.find_table_client.get_result()
+
+        # remove previous objects
+        # for name in self.scene.getKnownCollisionObjects():
+            # self.scene.removeCollisionObject(name, False)
+        # for name in self.scene.getKnownAttachedObjects():
+            # self.scene.removeAttachedObject(name, False)
+        rospy.loginfo("Waiting for sync")
+        self.scene.waitForSync()
+        # insert objects to scene
+        idx = -1
+        if find_result == 0:
+            rospy.loginfo("No tables found")
+        else:
+            rospy.loginfo("found table %f", find_result.detectedTables)
+            self.table = find_result.detectedTables
+
+    def getTable(self):
+        # self.table 
+	rospy.loginfo("getTable")
+        return None, None
+
+    def getSupportSurface(self, name):
+        for surface in self.support_surfaces:
+            if surface.name == name:
+                return surface
+        return None
+
+    def getPlaceLocation(self):
+        pass
+
+    def pick(self, block, grasps):
+        success, pick_result = self.pickplace.pick_with_retry(block.name,
+                                                              grasps,
+                                                              support_name=block.support_surface,
+                                                              scene=self.scene)
+        self.pick_result = pick_result
+        return success
+
+    def place(self, block, pose_stamped):
+        places = list()
+        l = PlaceLocation()
+        l.place_pose.pose = pose_stamped.pose
+        l.place_pose.header.frame_id = pose_stamped.header.frame_id
+
+        # copy the posture, approach and retreat from the grasp used
+        l.post_place_posture = self.pick_result.grasp.pre_grasp_posture
+        l.pre_place_approach = self.pick_result.grasp.pre_grasp_approach
+        l.post_place_retreat = self.pick_result.grasp.post_grasp_retreat
+        places.append(copy.deepcopy(l))
+        # create another several places, rotate each by 90 degrees in yaw direction
+        l.place_pose.pose = rotate_pose_msg_by_euler_angles(l.place_pose.pose, 0, 0, 1.57)
+        places.append(copy.deepcopy(l))
+        l.place_pose.pose = rotate_pose_msg_by_euler_angles(l.place_pose.pose, 0, 0, 1.57)
+        places.append(copy.deepcopy(l))
+        l.place_pose.pose = rotate_pose_msg_by_euler_angles(l.place_pose.pose, 0, 0, 1.57)
+        places.append(copy.deepcopy(l))
+
+        success, place_result = self.pickplace.place_with_retry(block.name,
+                                                                places,
+                                                                scene=self.scene)
+        return success
+
+    def tuck(self):
+        joints = ["arm_shoulder_pan_joint", "arm_shoulder_lift_joint", "arm_upperarm_roll_joint",
+                  "arm_elbow_flex_joint", "arm_wrist_flex_joint", "arm_wrist_roll_joint"]
+        # pose = [1.32, 1.40, -0.2, 1.72, 1.66, 0.0]
+        pose = [0.00, 0.00, 0.00, 0.00, 0.00, 0.0]
+        while not rospy.is_shutdown():
+            result = self.move_group.moveToJointPosition(joints, pose, 0.02)
+            if result.error_code.val == MoveItErrorCodes.SUCCESS:
+                return
+
+if __name__ == "__main__":
+    # Create a node
+    rospy.init_node("demo")
+
+    # Make sure sim time is working
+    while not rospy.Time.now():
+        pass
+
+    # Setup clients
+    move_base_ = MoveBaseClient()
+    torso_action_ = TorsoClient()
+    head_action_ = PointHeadClient()
+    grasping_client_ = GraspingClient()
+    tw_ = twist_moves()
+
+#    for x in range(4):
+#      for y in range(4):
+#        head_action.look_at((4.0-(x/2.0)), (4.0-(y/2.0)), 0.0, "map")
+#        grasping_client.updateScene()
+#        cube, grasps = grasping_client.getGraspableCube()
+#    head_action.pan_tilt(0.0, 0.0)
+
+    torso_action_.tuck_arm()
+    # rospy.loginfo("lowering torso ...")
+    # torso_action.move_to(-0.591)
+    #rospy.loginfo("Raising torso 0...")
+    #torso_action.move_to(0.0)
+    # rospy.loginfo("pan_tilt 0 0")
+    # head_action.pan_tilt(0.0, 0.0)
+
+
+    # tw.rotate_once()
+
+    # Move the base to be in front of the table
+    # Demonstrates the use of the navigation stack
+    # Orig:
+    #   move_base.goto(2.250, 3.118, 0.0)
+    best_tab = 0;
+    best_x = 0;
+    best_y = 0;
+    # scan_for_table()
+    for x in range(8):
+      for y in range(8):
+        head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+        if (tab_val > best_tab):
+          best_tab = tab_val
+          best_x = 7.5 - x / 2.0
+          best_y = 7.5 - y / 2.0
+    
+    head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+    tab_val = grasping_client.lookForTable()
+    head_action.look_at(self.tab.centroid.x, self.tab.controid.y, 0.0, "map")
+
+    head_action.verify_clear_path()
+    tw.nav_to_table_no_slam()
+
+    while (head_action.find_cube_on_table()):
+      tw.goto_cube()
+      # follow_table_edge
+      #   head_action.verify_clear_path()
+      # tw.rotate_to_cube
+      tw.move_next_to_table
+      grasping_client.pick_up_cube()
+      head_action.verify_cube_in_grasp()
+      find_box_on_table
+      follow_table_edge
+      tw.move_next_to_table
+      drop_cube_in_box()
+
+
+
+
+
+#    def rotate_to_box()
+#
+#    def find_cube_on_table
+#
+#
+#    def find_box_on_table
+#
+#
+#    def drive_to_cube
+#
+#    def drive_to_box
+
+
+
+    # move_base.goto(2.700, 3.318, 0.0)
+
+    # Raise the torso using just a controller
+    rospy.loginfo("Raising torso...")
+    torso_action.move_to(-0.1)
+
+    # Point the head at the cube we want to pick
+    # head_action.look_at(3.75, 3.18, 0.0, "map")
+    # <pose>3.7 2.85 0.83 0 0 0</pose>
+    # rospy.loginfo("look_at 3.75 3.18")
+    # head_action.look_at(3.75, 3.18, 0.0, "map")
+    # rospy.loginfo("pan_tilt 0 1.57")
+    # head_action.pan_tilt(0.0, 1.57)
+
+
+    # Get block to pick
+    while not rospy.is_shutdown():
+        rospy.loginfo("Picking object...")
+        grasping_client.updateScene()
+        cube, grasps = grasping_client.getGraspableCube()
+        if cube == None:
+            rospy.logwarn("Perception failed.")
+            continue
+
+        # Pick the block
+        if grasping_client.pick(cube, grasps):
+            break
+        rospy.logwarn("Grasping failed.")
+
+    # Tuck the arm
+    grasping_client.tuck()
+
+    # Lower torso
+    rospy.loginfo("Lowering torso...")
+    # torso_action.move_to([0.0, ])
+    torso_action.move_to([-0.591, ])
+
+    # Move to second table
+    # rospy.loginfo("Moving to second table...")
+    # move_base.goto(-3.53, 3.75, 1.57)
+
+    # Raise the torso using just a controller
+    rospy.loginfo("Raising torso...")
+    # torso_action.move_to([0.4, ])
+    torso_action.move_to([-0.1, ])
+
+    # rospy.loginfo("head 1.57 0 -1.57 ")
+    # head_action.look_at(1.57, 0.0, 0.0, "map")
+    # head_action.look_at(1.57, 0.0, -1.57, "map")
+
+    # Place the block
+    while not rospy.is_shutdown():
+        rospy.loginfo("Placing object...")
+        pose = PoseStamped()
+        pose.pose = cube.primitive_poses[0]
+        pose.pose.position.z += 0.05
+        pose.header.frame_id = cube.header.frame_id
+        if grasping_client.place(cube, pose):
+            break
+        rospy.logwarn("Placing failed.")
+
+    # Tuck the arm, lower the torso
+    grasping_client.tuck()
+    # torso_action.move_to([0.0, ])
+    torso_action.move_to([-0.591, ])
+    def odometryCb(self, msg):
+        while self.latch_:
+          rospy.sleep(1)
+        self.latch_ = True
+        if self.odom_msg_cnt_ > 1:
+          self.prev_msg_ = self.cur_odom_msg_
+        self.cur_odom_msg_ = msg
+        self.latch_ = False
+        self.odom_msg_cnt_ = self.odom_msg_cnt_ + 1
+
+    def lidarCB(self, msg):
+        # number of inches to obstacle
+        self.min_dist_ = 100000
+        for i in range (msg.range_max - msg.range_min)
+          if self.min_lidar_dist_ > msg.ranges[i + msg.range_min]:
+            self.min_lidar_dist_ = msg.ranges
+            self.min_lidar_dist_range_ = i + msg.range_min
+        if self.min_lidar_dist_ < self.obstacle_dist_:
+          self.lidar_obstacle_ = True
+        else
+          self.lidar_obstacle_ = False
+ 
+    def ptCloudCB(self, msg):
+        # ensure that robot is clear by 12" (.3 meters) in front / all sides
+        # obstacle height, distance, direction 
+   
+    def setHeadObstacleAngle(self, x, y):
+        self.head_obstacle_x_ = x
+        self.head_obstacle_y_ = y
+
+        head_action.pan_tilt( self.head_obstacle_x_, self.head_obstacle_y_)
+
+    def setMaxObstacleDist(self, dist):
+        self.obstacle_dist_ = dist
+       
+    def ccw(A,B,C):
+        return (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x)
+
+    # Return true if line segments AB and CD intersect
+    def intersect(A,B,C,D):
+        return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
+
+ 	
+    # Given a line with coordinates 'start' and 'end' and the
+    # coordinates of a point 'pnt' the proc returns the shortest 
+    # distance from pnt to the line and the coordinates of the 
+    # nearest point on the line.
+    #
+    # 1  Convert the line segment to a vector ('line_vec').
+    # 2  Create a vector connecting start to pnt ('pnt_vec').
+    # 3  Find the length of the line vector ('line_len').
+    # 4  Convert line_vec to a unit vector ('line_unitvec').
+    # 5  Scale pnt_vec by line_len ('pnt_vec_scaled').
+    # 6  Get the dot product of line_unitvec and pnt_vec_scaled ('t').
+    # 7  Ensure t is in the range 0 to 1.
+    # 8  Use t to get the nearest location on the line to the end
+    #    of vector pnt_vec_scaled ('nearest').
+    # 9  Calculate the distance from nearest to pnt_vec_scaled.
+    # 10 Translate nearest back to the start/end line. 
+    # Malcolm Kesson 16 Dec 2012
+      
+    def pnt2line(pnt, start, end):
+        line_vec = vector(start, end)
+        pnt_vec = vector(start, pnt)
+        line_len = length(line_vec)
+        line_unitvec = unit(line_vec)
+        pnt_vec_scaled = scale(pnt_vec, 1.0/line_len)
+        t = dot(line_unitvec, pnt_vec_scaled)    
+        if t < 0.0:
+            t = 0.0
+        elif t > 1.0:
+            t = 1.0
+        nearest = scale(line_vec, t)
+        dist = distance(nearest, pnt_vec)
+        nearest = add(nearest, start)
+        return(dist, nearest)
+
+# //--------------------
+        find_table_topic = "basic_grasping_perception/find_tables"
+        self.find_table_client = actionlib.SimpleActionClient(find_table_topic, FindTablesAction)
+        self.find_table_client.wait_for_server(rospy.Duration(5.0))
+        rospy.loginfo("Waiting for %s complete..." % find_table_topic)
+`
+        goal = FindTablesGoal()
+        self.find_table_client.send_goal(goal)
+        self.find_table_client.wait_for_result(rospy.Duration(5.0))
+        find_result = self.find_table_client.get_result()
+
+			# // ------------------------------------------------------------------------
+			# // filter cloud to cut out close things that mess with our ground detection
+			# // ------------------------------------------------------------------------
+			# pt_filter.setInputCloud(ground_detection_cloud);
+			# pt_filter.setFilterFieldName("z");
+			# pt_filter.setFilterLimits(0.0, 1.0);
+			# pt_filter.setFilterLimitsNegative(true);
+			# pt_filter.filter(*ground_detection_cloud);
+  // Crop
+#  robot_width = 0.4064
+#  pcl::PassThrough<pcl::PointXYZ> pass;
+#  pass.setInputCloud (cloud);
+#  pass.setFilterFieldName ("y");
+#  pass.setFilterLimits (0.0, self.obstacle_dist_)
+#  pass.setFilterFieldName ("x");
+#  pass.setFilterLimits (-self.obstacle_dist - robot_width/2, 
+#                         self.obstacle_dist_ + robot_width/2)
+#  //pass.setFilterLimitsNegative (true);
+#  pass.filter (*cloud_filtered);
+#
+#
+#
+#			if(new_cloud->size() <= 0 || ground_cloud->size() <= 0 || object_detection_cloud->size() <= 0) {
+#				cld_mutex.unlock();
+#				continue;
+#
+#      // check for corner
+#
+#      // check for edge
+#
+#      // check for curved table
+#
+#go towards closest point on table until max sized convex hull found
+#   - look at table as you go
+#   - aim for middle of convex hull
+#   - look for cube/box on table as you go if distance < C/B
+#
+#Find cube:
+#   - find closest point on convex hull to cube (may be between points)
+#      - at right angles
+#   - find line segment from robot to cube table edge
+#   - see if convext hull consecutive points intersect robot-cube line segment
+#   - If intersect, find closest convex point to cube that has no intersect line segment, go to that point
+#   - save convex hull with biggest area of max-min X*Y
+#        - save height
+#
+#Go toward closest point
+#   - get no closer than obstacle_dist_
+#   - follow convex hull points - with padding for obstacle_dist_
+#   - check focus on ground to ensure clear path
+#   - check if any table height obstacle. If so, stop and add to padding 
+#
+#when near closest convex hull point
+#   - look towards table
+#   - scan table top to find cube
+#   - find table point closest to cube
+#   - confirm that closest convex hull point
+#   - go to that point
+#
+#go toward cube
+#				
+#}
+#
+#    def validate_clear_path(self, from_x, from_y, to_x, to_y):
+
+
+    # by odom
+    def stop_rotate(self):
+        tw = twist_moves()
+        twist_again = True
+        # ensure not moving
+        prev_x = 100000000
+        prev_y = 100000000
+        while self.latch_ or self.odom_msg_cnt_ < 2:
+          rospy.sleep(1)
+        cur_x = self.cur_odom_msg_.pose.pose.position.x
+        cur_y = self.cur_odom_msg_.pose.pose.position.y
+        cur_odom_msg = self.odom_msg_cnt_
+        while prev_x!=cur_x or prev_y!=cur_y:
+          if cur_odom_msg>self.odom_msg_cnt_-10:
+            rospy.sleep(1)
+            continue
+          tw.twist_heading(0.0)
+          rospy.sleep(1)
+          prev_x = cur_x
+          prev_y = cur_y
+          cur_odom_msg = self.msg_odom_cnt_
+          cur_x = self.cur_odom_msg_.pose.pose.position.x
+          cur_y = self.cur_odom_msg_.pose.pose.position.y
+          rospy.loginfo("try to stop: x %f y %f", cur_x, cur_y)
+
+
+    # def goto_table(self):
+
+
+    # by vision
+    def rotate_towards_table(self):
+        r = rospy.Rate(5.0)
+        rospy.loginfo("rotate once to start localization...")
+        twist = Twist()
+        twist.angular.z = 1.57/8    # 90 deg/ 8s * 8sec = 90 degrees
+        # 4 times * 5 hz * 8 sec * (90 deg / 8)
+        maxtab = 0
+        for i in range(4 * 5 * 18):
+          self.pub.publish(twist)
+          r.sleep()
+          if i%10 == 0 or maxtab > 0:
+            grasping_client.lookForTable()
+            if maxtab < self.table:
+              maxtab = self.table
+            elif maxtab > self.table:
+              stop_twist()
+              break
+            # cube, grasps = grasping_client.getTable()
+            
+            # lookat centroid 
+            # handle case where complex hull is at or near max/min X/Y
+            #   - start looking for the cube/box
+
+        # self.stop_twist()
+
+        
+
+    # by vision
+    def goto_table(self, des_x, des_y):
+rotate to table centroid
+move straight foward and look at table
+   - use SLAM to get current position, estimated X/Y of table, and 
+     go to closest hull point to centroid
+      -- but if ground obstacle, vision-based "stop and rotate" will be 
+         wrong without looking for clear path
+      -- Check if XY of table changes while driving. If so, replan.
+      -- rotate head around for a "rotation" then look at Table centroid
+         and check rotation.
+
+if table centroid moves more than a delta XY, stop and replan
+after "costmap cleared", rotate to table centroid
+    -- nav_core::RecoveryBehavior interface found in the nav_core package and can be used as a recovery behavior plugin 
+    -- carrot_planner::CarrotPlanner
+/*
+#include <tf/transform_listener.h>
+#include <costmap_2d/costmap_2d_ros.h>
+#include <rotate_recovery/rotate_recovery.h>
+
+...
+tf::TransformListener tf(ros::Duration(10));
+costmap_2d::Costmap2DROS global_costmap("global_costmap", tf);
+costmap_2d::Costmap2DROS local_costmap("local_costmap", tf);
+
+rotate_recovery::RotateRecovery rr;
+rr.initialize("my_rotate_recovery", &tf, &global_costmap, &local_costmap);
+
+rr.runBehavior();
+http://wiki.ros.org/rotate_recovery
+http://docs.ros.org/jade/api/rotate_recovery/html/rotate__recovery_8cpp_source.html
+http://wiki.ros.org/navigation/Tutorials/Writing%20A%20Global%20Path%20Planner%20As%20Plugin%20in%20ROS
+
+
+
+#include <tf/transform_listener.h>
+#include <costmap_2d/costmap_2d_ros.h>
+#include <carrot_planner/carrot_planner.h>
+
+...
+tf::TransformListener tf(ros::Duration(10));
+costmap_2d::Costmap2DROS costmap("my_costmap", tf);
+
+carrot_planner::CarrotPlanner cp;
+cp.initialize("my_carrot_planner", &costmap);
+http://wiki.ros.org/navigation/Tutorials/Writing%20A%20Global%20Path%20Planner%20As%20Plugin%20in%20ROS
+  */
+
+        rospy.loginfo("goto table")
+        tw = twist_moves()
+        twist_again = True
+        self.stop_rotate() # ensure not moving
+        twist_again = True
+        while twist_again:
+          while self.latch_ or self.msg_cnt_ < 2:
+            rospy.sleep(1)
+          self.latch_ = True;
+          # (roll, pitch, yaw) = tf.transformations.euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+          (roll, pitch, prev_th) = tf.transformations.euler_from_quaternion([self.prev_msg_.pose.pose.orientation.x,self.prev_msg_.pose.pose.orientation.y,self.prev_msg_.pose.pose.orientation.z,self.prev_msg_.pose.pose.orientation.w])
+          (roll, pitch, cur_th) = tf.transformations.euler_from_quaternion([self.cur_odom_msg_.pose.pose.orientation.x,self.cur_odom_msg_.pose.pose.orientation.y,self.cur_odom_msg_.pose.pose.orientation.z,self.cur_odom_msg_.pose.pose.orientation.w])
+          cur_x = self.cur_odom_msg_.pose.pose.position.x
+          cur_y = self.cur_odom_msg_.pose.pose.position.y
+          des_th = atan2((des_y-cur_y),(des_x-cur_x))
+          # des_th = atan2((des_x-cur_x),(des_y-cur_y))
+
+          # if self.prev_msg_ == self.cur_odom_msg_ and cur_th == des_th:
+          rospy.loginfo("x %f y %f th %f des_th %f dif %f", cur_x, cur_y, cur_th, des_th, des_th - cur_th)
+          if abs(cur_th - des_th) < .06 and self.prev_th_ == cur_th and self.odom_msg_cnt_ - cnt >= 10:
+            self.latch_ = False
+            twist_again = False
+            rospy.loginfo("Rotation complete")
+            continue
+          if abs(cur_th - des_th) < .06 and self.prev_th_ == cur_th and cnt == 10000000000000000:
+            cnt = self.odom_msg_cnt_ 
+            rospy.sleep(5)
+          else:
+            cnt = 10000000000000000
+          self.latch_ = False
+          self.prev_th_ = cur_th
+          if abs(cur_th - des_th) < .06:
+            tw.twist_heading(0.0)
+          else:
+            tw.twist_heading(des_th - cur_th)
+        self.stop_rotate() # ensure not moving
+
+    def __init__(self, self.use_odom_, self.use_lidar_, self.use_ptcloud_):
+        # rospy.init_node('heading client', anonymous=True) #make node 
+        if self.use_odom_:
+          rospy.Subscriber('odom',Odometry, self.odometryCb)
+        if self.use_lidar_:
+          rospy.Subscriber('base_scan',LaserScan, self.odometryCb)
+        if self.use_ptCloud_:
+          rospy.Subscriber('/head_camera/depth_registered/points',PointCloud2, self.ptCloudCb)
+        self.latch_ = False
+        self.odom_msg_cnt_ = 0
+        self.prev_th_ = 5000  # not within legal range
+        self.obstacle_dist = .3
+        
+# Move base using navigation stack odometry
+class MoveBaseClient(object):
+
+    def __init__(self):
+        self.client = actionlib.SimpleActionClient("move_base", MoveBaseAction)
+        rospy.loginfo("Waiting for move_base...")
+        self.client.wait_for_server()
+        rospy.loginfo("OK for move_base...")
+        self.pub = rospy.Publisher('/base_controller/command', Twist, queue_size=30)
+        # give our node/publisher a bit of time to connect
+        rospy.loginfo("Waiting for base_controller...")
+        rospy.sleep(1)
+
+    def stop_twist(self):
+        twist = Twist()
+        rospy.loginfo("stop via direcion change...")
+        for s in range(4):         # 10*5hz = 2sec
+          # twist.linear.x = -0.00001
+          twist.angular.z = 0
+          self.pub.publish(twist)
+          rospy.sleep(1)
+
+    # def twist_towards(self, x, y)
+
+
+    # odom only
+    def goto(self, x, y, theta, frame="map"):
+      compute_goal = True
+      hc = HeadingClient()
+      # hc.rotate_towards(x,y)
+      while compute_goal:
+        move_goal = MoveBaseGoal()
+        move_goal.target_pose.pose.position.x = x
+        move_goal.target_pose.pose.position.y = y
+        move_goal.target_pose.pose.orientation.z = sin(theta/2.0)
+        move_goal.target_pose.pose.orientation.w = cos(theta/2.0)
+        move_goal.target_pose.header.frame_id = frame
+        move_goal.target_pose.header.stamp = rospy.Time.now()
+
+        # TODO wait for things to work
+        # gid = self.client.send_goal(move_goal)
+        self.client.send_goal(move_goal)
+        rospy.loginfo("send goal for move_base: x %f, y %f, theta %f" %(x, y, theta))
+        # self.client.wait_for_result()
+        # self.client.wait_for_result(rospy.Duration(125.0))
+        self.client.wait_for_result(rospy.Duration(30.0))
+
+        if (self.client.get_state() != am.GoalStatus.SUCCEEDED):
+          compute_goal = True
+          self.client.cancel_goal()
+          # tw.stop_twist()
+          hc.rotate_towards(x,y)
+          # tw.stop_twist()
+          rospy.loginfo("recompute move_base...")
+          # self.client.goto(x, y, theta, frame)
+        else:
+          compute_goal = False
+          # tw.stop_twist()
+      rospy.loginfo("move_base success...")
+
+# Send a trajectory to controller
+class TorsoClient(object):
+
+    def __init__(self):
+        self.client = actionlib.SimpleActionClient("torso_controller/follow_joint_trajectory",
+                                                   FollowJointTrajectoryAction)
+        rospy.loginfo("Waiting for torso_controller")
+        self.client.wait_for_server()
+        rospy.loginfo("Waiting complete for torso_controller")
+
+    def move_to(self, position, duration=15.0):
+        # trajectory = JointTrajectory()
+        # trajectory.joint_names = ["arm_lift_joint",]
+        # trajectory.points.append(JointTrajectoryPoint())
+        # trajectory.points[0].positions = [position, ]
+        # trajectory.points[0].velocities = [0.0,]
+        # trajectory.points[0].accelerations = [0.0,]
+        # trajectory.points[0].time_from_start = rospy.Duration(duration)
+        # follow_goal = FollowJointTrajectoryGoal()
+        # follow_goal.trajectory = trajectory
+        torso_goal = FollowJointTrajectoryGoal()
+        torso_point = JointTrajectoryPoint()
+        torso_point.positions = [position,]
+        torso_point.velocities = [0.0,]
+        torso_point.accelerations = [0.0,]
+        torso_point.time_from_start = rospy.Duration(duration)
+        torso_goal.trajectory.points.append(torso_point)
+        torso_goal.trajectory.header.stamp = rospy.Time.now()
+        torso_goal.trajectory.joint_names = ["arm_lift_joint",]
+
+        self.client.send_goal(torso_goal)
+        rospy.loginfo("moveto goal")
+        self.client.wait_for_result(rospy.Duration(duration))
+        rospy.loginfo("moveto done")
+
+    def tuck_arm(self, duration=15.0):
+        torso_goal = FollowJointTrajectoryGoal()
+        torso_point = JointTrajectoryPoint()
+        torso_point.positions = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        torso_point.velocities = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        torso_point.accelerations = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        torso_point.time_from_start = rospy.Duration(duration)
+        torso_goal.trajectory.points.append(torso_point)
+        torso_goal.trajectory.header.stamp = rospy.Time.now()
+        torso_goal.trajectory.joint_names = ["arm_lift_joint","arm_shoulder_pan_joint","arm_shoulder_lift_joint","arm_upperarm_roll_joint","arm_elbow_flex_joint","arm_wrist_flex_joint","arm_wrist_roll_joint"]
+
+        self.client.send_goal(torso_goal)
+        rospy.loginfo("moveto goal")
+        self.client.wait_for_result(rospy.Duration(duration))
+        rospy.loginfo("moveto done")
+
+
+# Point the head using controller
+class PointHeadClient(object):
+    def __init__(self):
+        self.client = actionlib.SimpleActionClient("head_controller/point_head", PointHeadAction)
+        rospy.loginfo("Waiting for head_controller...")
+        self.client.wait_for_server()
+        rospy.loginfo("Waiting for head_controller complete...")
+        self.pan_tilt_client = actionlib.SimpleActionClient(
+                                     "head_controller/follow_joint_trajectory",
+                                     FollowJointTrajectoryAction)
+        rospy.loginfo("Waiting for pan-tilt head_controller...")
+        self.pan_tilt_client.wait_for_server()
+        rospy.loginfo("Waiting for pan-tilt head_controller complete...")
+
+
+    def look_at(self, x, y, z, frame, duration=5.0):
+        goal = PointHeadGoal()
+        goal.target.header.stamp = rospy.Time.now()
+        goal.target.header.frame_id = frame
+        goal.target.point.x = x
+        goal.target.point.y = y
+        goal.target.point.z = z
+        goal.min_duration = rospy.Duration(duration)
+        self.client.send_goal(goal)
+        rospy.loginfo("look_at goal %f %f" % (x, y))
+        self.client.wait_for_result(rospy.Duration(5.0))
+        rospy.loginfo("look_at done")
+   
+    def pan_tilt(self, pan, tilt):
+        duration = 5
+        trajectory = JointTrajectory()
+        trajectory.joint_names = ["head_pan_joint", "head_tilt_joint"]
+        trajectory.points.append(JointTrajectoryPoint())
+        trajectory.points[0].positions = [pan, tilt]
+        trajectory.points[0].velocities = [0.0, 0.0]
+        trajectory.points[0].accelerations = [0.0, 0.0]
+        trajectory.points[0].time_from_start = rospy.Duration(duration)
+        follow_goal = FollowJointTrajectoryGoal()
+        follow_goal.trajectory = trajectory
+        self.pan_tilt_client.send_goal(follow_goal)
+        rospy.loginfo("pan_tilt goal")
+        self.pan_tilt_client.wait_for_result(rospy.Duration(5.0))
+        rospy.loginfo("pan_tilt done")
+
+        
+
+    def verify_clear_path
+
+   
+    def move_next_to_table
+    def rotate_to_cube
+    def rotate_to_box
+
+    def find_cube_on_table
+
+
+    def find_box_on_table
+
+    def follow_table_edge
+    
+    def drive_to_cube
+
+    def drive_to_box
+
+# Tools for grasping
+class NavigateClient(object):
+    def __init__(self):
+
+    def scan_for_table
+        # Move the base to be in front of the table
+        # Demonstrates the use of the navigation stack
+        # Orig:
+        #   move_base.goto(2.250, 3.118, 0.0)
+        best_tab = 0;
+        best_x = 0;
+        best_y = 0;
+        # scan_for_table()
+        for x in range(8):
+          for y in range(8):
+            self.head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+            if (tab_val > best_tab)
+              best_tab = tab_val
+              best_x = 7.5 - x / 2.0
+              best_y = 7.5 - y / 2.0
+
+        self.head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+        tab_val = self.grasping_client.lookForTable()
+        self.head_action.look_at(self.tab.centroid.x, self.tab.controid.y, 0.0, "map")
+
+
+# Tools for grasping
+class GraspingClient(object):
+
+    def __init__(self):
+        self.scene = PlanningSceneInterface("base_link")
+        self.pickplace = PickPlaceInterface("arm", "gripper", verbose=True)
+        self.move_group = MoveGroupInterface("arm", "base_link")
+
+        find_topic = "basic_grasping_perception/find_objects"
+        rospy.loginfo("Waiting for %s..." % find_topic)
+        self.find_client = actionlib.SimpleActionClient(find_topic, FindGraspableObjectsAction)
+        self.find_client.wait_for_server(rospy.Duration(5.0))
+        find_table_topic = "basic_grasping_perception/find_tables"
+        rospy.loginfo("Waiting for %s..." % find_table_topic)
+        self.find_table_client = actionlib.SimpleActionClient(find_table_topic, FindTablesAction)
+        self.find_table_client.wait_for_server(rospy.Duration(5.0))
+        rospy.loginfo("Waiting for %s complete..." % find_table_topic)
+
+    def updateScene(self):
+        # find objects
+        goal = FindGraspableObjectsGoal()
+        goal.plan_grasps = True
+        self.find_client.send_goal(goal)
+        self.find_client.wait_for_result(rospy.Duration(5.0))
+        find_result = self.find_client.get_result()
+
+        # remove previous objects
+        for name in self.scene.getKnownCollisionObjects():
+            self.scene.removeCollisionObject(name, False)
+        for name in self.scene.getKnownAttachedObjects():
+            self.scene.removeAttachedObject(name, False)
+        rospy.loginfo("Waiting for sync")
+        self.scene.waitForSync()
+
+        # insert objects to scene
+        idx = -1
+        for obj in find_result.objects:
+            idx += 1
+            obj.object.name = "object%d"%idx
+            self.scene.addSolidPrimitive(obj.object.name,
+                                         obj.object.primitives[0],
+                                         obj.object.primitive_poses[0],
+                                         wait = False)
+        rospy.loginfo("number of objects found: %d", idx)
+
+        for obj in find_result.support_surfaces:
+            # extend surface to floor, and make wider since we have narrow field of view
+            height = obj.primitive_poses[0].position.z
+            obj.primitives[0].dimensions = [obj.primitives[0].dimensions[0],
+                                            1.5,  # wider
+                                            obj.primitives[0].dimensions[2] + height]
+            obj.primitive_poses[0].position.z += -height/2.0
+
+            # add to scene
+            self.scene.addSolidPrimitive(obj.name,
+                                         obj.primitives[0],
+                                         obj.primitive_poses[0],
+                                         wait = False)
+
+        self.scene.waitForSync()
+
+        # store for grasping
+        self.objects = find_result.objects
+
+    def getGraspableCube(self):
+        graspable = None
+        for obj in self.objects:
+            # need grasps
+            if len(obj.grasps) < 1:
+                rospy.loginfo("no object.")
+                continue
+            # check size
+	    rospy.loginfo("object dimension: %f", obj.object.primitives[0].dimensions[0])
+            if obj.object.primitives[0].dimensions[0] < 0.05 or \
+               obj.object.primitives[0].dimensions[0] > 0.07 or \
+               obj.object.primitives[0].dimensions[0] < 0.05 or \
+               obj.object.primitives[0].dimensions[0] > 0.07 or \
+               obj.object.primitives[0].dimensions[0] < 0.05 or \
+               obj.object.primitives[0].dimensions[0] > 0.07:
+                continue
+            # has to be on table
+            if obj.object.primitive_poses[0].position.z < 0.5:
+	        rospy.loginfo("object z dimension: %f", obj.object.primitive_poses[0].position.z)
+                continue
+            return obj.object, obj.grasps
+        # nothing detected
+	rospy.loginfo("nothing detected")
+        return None, None
+
+    def lookForTable(self):
+        # find objects
+        goal = FindTablesGoal()
+        self.find_table_client.send_goal(goal)
+        self.find_table_client.wait_for_result(rospy.Duration(5.0))
+        find_result = self.find_table_client.get_result()
+
+        # remove previous objects
+        # for name in self.scene.getKnownCollisionObjects():
+            # self.scene.removeCollisionObject(name, False)
+        # for name in self.scene.getKnownAttachedObjects():
+            # self.scene.removeAttachedObject(name, False)
+        rospy.loginfo("Waiting for sync")
+        self.scene.waitForSync()
+        # insert objects to scene
+        idx = -1
+        if find_result == 0:
+            rospy.loginfo("No tables found")
+        else:
+            rospy.loginfo("found table %f", find_result.detectedTables)
+            self.table = find_result.detectedTables
+
+    def getTable(self):
+        # self.table 
+	rospy.loginfo("getTable")
+        return None, None
+
+    def getSupportSurface(self, name):
+        for surface in self.support_surfaces:
+            if surface.name == name:
+                return surface
+        return None
+
+    def getPlaceLocation(self):
+        pass
+
+    def pick(self, block, grasps):
+        success, pick_result = self.pickplace.pick_with_retry(block.name,
+                                                              grasps,
+                                                              support_name=block.support_surface,
+                                                              scene=self.scene)
+        self.pick_result = pick_result
+        return success
+
+    def place(self, block, pose_stamped):
+        places = list()
+        l = PlaceLocation()
+        l.place_pose.pose = pose_stamped.pose
+        l.place_pose.header.frame_id = pose_stamped.header.frame_id
+
+        # copy the posture, approach and retreat from the grasp used
+        l.post_place_posture = self.pick_result.grasp.pre_grasp_posture
+        l.pre_place_approach = self.pick_result.grasp.pre_grasp_approach
+        l.post_place_retreat = self.pick_result.grasp.post_grasp_retreat
+        places.append(copy.deepcopy(l))
+        # create another several places, rotate each by 90 degrees in yaw direction
+        l.place_pose.pose = rotate_pose_msg_by_euler_angles(l.place_pose.pose, 0, 0, 1.57)
+        places.append(copy.deepcopy(l))
+        l.place_pose.pose = rotate_pose_msg_by_euler_angles(l.place_pose.pose, 0, 0, 1.57)
+        places.append(copy.deepcopy(l))
+        l.place_pose.pose = rotate_pose_msg_by_euler_angles(l.place_pose.pose, 0, 0, 1.57)
+        places.append(copy.deepcopy(l))
+
+        success, place_result = self.pickplace.place_with_retry(block.name,
+                                                                places,
+                                                                scene=self.scene)
+        return success
+
+    def tuck(self):
+        joints = ["arm_shoulder_pan_joint", "arm_shoulder_lift_joint", "arm_upperarm_roll_joint",
+                  "arm_elbow_flex_joint", "arm_wrist_flex_joint", "arm_wrist_roll_joint"]
+        # pose = [1.32, 1.40, -0.2, 1.72, 1.66, 0.0]
+        pose = [0.00, 0.00, 0.00, 0.00, 0.00, 0.0]
+        while not rospy.is_shutdown():
+            result = self.move_group.moveToJointPosition(joints, pose, 0.02)
+            if result.error_code.val == MoveItErrorCodes.SUCCESS:
+                return
+
+if __name__ == "__main__":
+    # Create a node
+    rospy.init_node("demo")
+
+    # Make sure sim time is working
+    while not rospy.Time.now():
+        pass
+
+    # Setup clients
+    move_base_ = MoveBaseClient()
+    torso_action_ = TorsoClient()
+    head_action_ = PointHeadClient()
+    grasping_client_ = GraspingClient()
+    tw_ = twist_moves()
+
+#    for x in range(4):
+#      for y in range(4):
+#        head_action.look_at((4.0-(x/2.0)), (4.0-(y/2.0)), 0.0, "map")
+#        grasping_client.updateScene()
+#        cube, grasps = grasping_client.getGraspableCube()
+#    head_action.pan_tilt(0.0, 0.0)
+
+    torso_action_.tuck_arm()
+    # rospy.loginfo("lowering torso ...")
+    # torso_action.move_to(-0.591)
+    #rospy.loginfo("Raising torso 0...")
+    #torso_action.move_to(0.0)
+    # rospy.loginfo("pan_tilt 0 0")
+    # head_action.pan_tilt(0.0, 0.0)
+
+
+    # tw.rotate_once()
+
+    # Move the base to be in front of the table
+    # Demonstrates the use of the navigation stack
+    # Orig:
+    #   move_base.goto(2.250, 3.118, 0.0)
+    best_tab = 0;
+    best_x = 0;
+    best_y = 0;
+    # scan_for_table()
+    for x in range(8):
+      for y in range(8):
+        head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+        if (tab_val > best_tab) 
+          best_tab = tab_val
+          best_x = 7.5 - x / 2.0
+          best_y = 7.5 - y / 2.0
+    
+    head_action.look_at((8.0-(x/2.0)), (8.0-(y/2.0)), 0.0, "map")
+    tab_val = grasping_client.lookForTable()
+    head_action.look_at(self.tab.centroid.x, self.tab.controid.y, 0.0, "map")
+
+    head_action.verify_clear_path()
+    tw.nav_to_table_no_slam()
+
+    while (head_action.find_cube_on_table()
+      tw.goto_cube()
+      # follow_table_edge
+      #   head_action.verify_clear_path()
+      # tw.rotate_to_cube
+      tw.move_next_to_table
+      grasping_client.pick_up_cube()
+      head_action.verify_cube_in_grasp()
+      find_box_on_table
+      follow_table_edge
+      tw.move_next_to_table
+      drop_cube_in_box()
+
+
+
+
+
+    def rotate_to_box()
+
+    def find_cube_on_table
+
+
+    def find_box_on_table
+
+
+    def drive_to_cube
+
+    def drive_to_box
+
+
+
+    # move_base.goto(2.700, 3.318, 0.0)
+
+    # Raise the torso using just a controller
+    rospy.loginfo("Raising torso...")
+    torso_action.move_to(-0.1)
+
+    # Point the head at the cube we want to pick
+    # head_action.look_at(3.75, 3.18, 0.0, "map")
+    # <pose>3.7 2.85 0.83 0 0 0</pose>
+    # rospy.loginfo("look_at 3.75 3.18")
+    # head_action.look_at(3.75, 3.18, 0.0, "map")
+    # rospy.loginfo("pan_tilt 0 1.57")
+    # head_action.pan_tilt(0.0, 1.57)
+
+
+    # Get block to pick
+    while not rospy.is_shutdown():
+        rospy.loginfo("Picking object...")
+        grasping_client.updateScene()
+        cube, grasps = grasping_client.getGraspableCube()
+        if cube == None:
+            rospy.logwarn("Perception failed.")
+            continue
+
+        # Pick the block
+        if grasping_client.pick(cube, grasps):
+            break
+        rospy.logwarn("Grasping failed.")
+
+    # Tuck the arm
+    grasping_client.tuck()
+
+    # Lower torso
+    rospy.loginfo("Lowering torso...")
+    # torso_action.move_to([0.0, ])
+    torso_action.move_to([-0.591, ])
+
+    # Move to second table
+    # rospy.loginfo("Moving to second table...")
+    # move_base.goto(-3.53, 3.75, 1.57)
+
+    # Raise the torso using just a controller
+    rospy.loginfo("Raising torso...")
+    # torso_action.move_to([0.4, ])
+    torso_action.move_to([-0.1, ])
+
+    # rospy.loginfo("head 1.57 0 -1.57 ")
+    # head_action.look_at(1.57, 0.0, 0.0, "map")
+    # head_action.look_at(1.57, 0.0, -1.57, "map")
+
+    # Place the block
+    while not rospy.is_shutdown():
+        rospy.loginfo("Placing object...")
+        pose = PoseStamped()
+        pose.pose = cube.primitive_poses[0]
+        pose.pose.position.z += 0.05
+        pose.header.frame_id = cube.header.frame_id
+        if grasping_client.place(cube, pose):
+            break
+        rospy.logwarn("Placing failed.")
+
+    # Tuck the arm, lower the torso
+    grasping_client.tuck()
+    # torso_action.move_to([0.0, ])
+    torso_action.move_to([-0.591, ])

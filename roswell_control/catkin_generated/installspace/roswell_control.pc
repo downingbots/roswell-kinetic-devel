@@ -1,0 +1,8 @@
+prefix=/home/ros/catkin_ws/install
+
+Name: roswell_control
+Description: Description of roswell_control
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/ros/catkin_ws/install/lib 
+Requires: 

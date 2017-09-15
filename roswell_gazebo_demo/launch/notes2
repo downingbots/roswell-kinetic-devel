@@ -1,0 +1,149 @@
+Modes:
+
+Table
+  - convex hull
+  - center, width, depth, height (top of table), 
+  - score -> closest to "ideal" table
+
+
+Find Table from distance
+  - box on table
+  - cube on table 
+  - possible cube or box on table
+  - table
+  - possible table (ranking based on biggest table size or number of points)
+     -- For "too big table" or Shelf or step or chair or small table 
+        -- horizontal convex hull 
+     -- If wrong height?  Filter out floor and ceiling or out-of-reach
+        -- final non-table ranking
+
+Search for cube on nearby table
+
+Obstacle on ground 
+  - cube on ground
+
+add/remove cube/box/table (include rating and location )
+goto closest cub/box/table
+
+Find Table
+  - Rotate just the camera. Start from middle, scan left. 
+    Then back to middle, scan right.
+ 
+  - If found table, navigate to table
+  - If found possible table, 
+      - while table probability increasing
+        - navigate towards table 
+      - if possible table probability decreasing, then scan for 
+        higher probability Table
+  - If not found, 
+      - reduce z filtering criteria?
+      - rotate 180 degrees and scan again
+      - if not found this time, then explore mode 
+
+Navigate to table 
+  - find location in a foot in front of table
+    current location
+    listener.lookupTransform(/base_link","/map","ros::Time(0), transform);
+    go through all points in convex hull of table and compute distance
+    keep track of min distance point on convex. Compute a line and reduce
+    distance by 2 feet to end. 
+  - use costmap_2d to implement obstacle layer from point cloud
+      -- http://wiki.ros.org/costmap_2d/Tutorials/Configuring%20Layered%20Costmaps
+      -- http://answers.ros.org/question/251019/how-to-specify-costmap_2d-layers/
+      -- http://answers.ros.org/question/55013/navigation-with-a-laser-and-a-kinect/
+         scan from kinect (depthimage_to_laserscan) . Out of date?
+  - When obstacle detected, scan for cube on ground?
+      -- change mode if cube found
+  - DISCARDED IDEA: Look for 2*width straight line floor path to table
+    - if yes, turn to straight kinect. move straight to table
+    - use slam to that point?
+      -- if a straight path is available, why doesn't SLAM use it?
+         Because SLAM uses probablistic localization that is continusously updated
+ 
+Use SMACH?
+
+Move to table
+  - move linear and arm above table
+  - using lidar and kinect info, inch forward to point where 
+    80-20 bar almost touches table
+
+Back off from table
+  - use kinect to check area behind
+  - inch back from table
+  - rotate +- 90 or 180 degrees around
+
+Navigate to cube on table
+  - Follow edge of table along shortest convex hull distance
+  - Look down on ground. Look for flat space 2 width of robot to side of table a    and follow contours of convex hull to cube.
+  - if something on ground,
+      - check if block.  
+          - yes: if no block in gripper, pick up block  
+          - no: go around? How much? Check for walls? 
+
+Use
+   
+
+Navigate around cube
+
+Navigate to cube on ground
+
+Pick up cube
+Cube in gripper?
+Put cube in box
+
+Eventually generalize to store cube location and box locations
+store cube / box / table location
+
+SMACH States?
+
+state:
+  list of cubes
+  list of boxes
+  list of tables (including convex hull)
+  list of possible tables
+  gripper status: cube, no_cube
+
+put all cubes in close box
+  cube_in_gripper
+  no cube in gripper
+
+find_cube
+find_box
+put_cube_in_box
+
+goto nearest cube
+  if not there, remove cube and recurse
+  if no cube, find nearest table
+goto nearest box
+goto nearest table
+Scan_for_new_table
+explore
+
+navigate_to_table
+  -> look for obstacles
+  -> when close, scan table
+  -> when rotating endlessly, 
+     stop and scan for table in expected location
+     if found, point body toward table and update estimated location
+     if not found, scan for table again (or remove table and goto nearest table)
+navigate_to_possible_table
+  -> preemptive updating of state of table
+found new cube (on which table or floor location)
+found new box (on which table or floor location)
+navigate_to_cube_on_table
+move_to_table
+explore
+  found_table
+  found_cube
+  completed map
+pick up cube
+place cube in box
+found obstacle
+  if cube, add cube
+  if box, add box
+  if table, add table
+  return to previous state
+  
+Scan_tabletop
+dropped cube check
+

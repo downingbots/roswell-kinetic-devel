@@ -1,0 +1,17 @@
+<package>
+  <name>roswell_navigation</name>
+  <version>0.2.0</version>
+  <description>
+    Navigation configuration for Maxwell.
+  </description>
+  <author>Michael Ferguson</author>
+  <maintainer email="mike@vanadiumlabs.com">Michael Ferguson</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/roswell_navigation</url>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>navigation</run_depend>
+</package>
+
+

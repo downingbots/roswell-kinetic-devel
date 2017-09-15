@@ -1,0 +1,12 @@
+Find something in room that you can pick up:
+ - pick up, check if within gripper
+ - carry over to another location and drop off
+ - maximize points per minute:
+
+--------------
+Point system:
+ - more points for something new or not used for longer time
+ - more points for dropping off at a higher location 
+   (including on top of other blocks) 
+ - more points for dropping off a farther distance away 
+   (higher is more important)

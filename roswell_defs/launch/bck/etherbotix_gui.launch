@@ -1,0 +1,11 @@
+<launch>
+
+  <node name="etherbotix_gui" pkg="etherbotix_python" type="etherbotix_gui.py">
+    <rosparam file="$(find roswell_defs)/params/roswell.yaml" command="load" />
+
+  </node>
+<!--
+    <param name="axis_linear" value="1"/>
+-->
+
+</launch>

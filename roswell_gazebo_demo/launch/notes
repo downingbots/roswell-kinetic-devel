@@ -1,0 +1,51 @@
+Problems hit:
+- inconsistent upgrades
+- many urdf tweaks
+  -- added transmission, but missing one!
+  -- added weights, inertia
+- geometry box touched ground - not gazebo based
+  -- needed to add rear wheel
+  -- thought it was the pid again -> not correct
+
+- the arm's linear actuator dropped to the floor
+  -- made all the weights and inertia near zero
+  -- thought it was the pid again -> not correct
+  -- type of controller not supported
+
+- navigation turning and rotating not good
+  -- thought it was the pid again -> not correct
+  -- reduced speed made ton of difference
+  -- friction?
+
+- rotating continues despite zero velocity
+  -- thought it was the pid again -> not correct
+  -- friction?
+  -- reduced speed of rotation, explicitly stop rotation by negligable 
+     moving forward 
+
+- point cloud sensor in wrong frame in gazebo, requiring more urdf tweaks
+- starting location not quite right (rotate once to get slam to correct)
+
+- lots of interacting parts. All of which change behavior, but not root cause 
+  of problem. mu1, mu2, Kp, Kd,...
+  Also setting ./roswell_navigation/config/roswell//move_base.yaml params
+
+- Good news: some of the above problems would be my bugs on the real robot, 
+  and may have been even harder to debug. Although gazebo introduces 
+  non-realworld limitations,
+  once you have a working baseline, you can prototype on Gazebo and more quickly 
+  move to real robot.
+
+- torsional friction not supported in gazebo until gazabo7. With frequent 
+  rotations for moveit recovery, the simulation was unacceptable. Have
+  to upgrade to gazebo7, which has its own dependencies... 
+  Now upgrading libboost and installing many other dependencies..
+ 
+-  Modified link.text in many ~/catikin/build/gazebo_ros_* directories to
+   dynamically link .so versions of boost libriaries: 
+   /usr/lib/x86_64-linux-gnu/libboost_iostreams.so /usr/lib/x86_64-linux-gnu/libboost_regex.so /usr/lib/x86_64-linux-gnu/libboost_thread.so  /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so 
+
+-  Re-modified many gazebo_row link.text again after gazebo upgrade
+   Next time write a script!!!!
+
+- fixed minor gazebo7 incompatibilites with 2.2  

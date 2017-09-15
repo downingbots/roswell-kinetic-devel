@@ -1,0 +1,8 @@
+prefix=/home/ros/catkin_ws/install
+
+Name: roswell_gazebo_demo
+Description: Description of roswell_gazebo_demo
+Version: 0.6.1
+Cflags: 
+Libs: -L/home/ros/catkin_ws/install/lib 
+Requires: 

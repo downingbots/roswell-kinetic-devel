@@ -1,0 +1,8 @@
+<launch>
+  <arg name="model" default="roswell" doc="model type [roswell, burger, waffle]"/>
+
+  <param name="tb3_model" value="$(arg model)"/>
+
+  <node name="gazebo_ros_roswell_tb3_tutorial" pkg="roswell_tb3_sim" type="gazebo_ros_roswell_tb3" required="true" output="screen">
+  </node>
+</launch>

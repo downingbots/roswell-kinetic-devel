@@ -1,0 +1,17 @@
+#robot_base_frame: base_link
+robot_base_frame: /base_footprint
+
+# <box size="0.4064 0.4064 0.06"/>,wheels at x= 0.19304 from center
+footprint: [[.01016, -0.20320], [.01016, 0.20320], [-0.39624, -0.20320], [-0.39624, 0.20320]]
+
+# was 0.5
+transform_tolerance: 0.35
+
+#robot_radius: 0.30 # fetch
+robot_radius: 0.19304
+inflater:
+  # robot_radius: 0.30 # fetch
+  robot_radius: 0.19304
+  inflation_radius: 0.35
+
+# Obstacles are defined in robot folders

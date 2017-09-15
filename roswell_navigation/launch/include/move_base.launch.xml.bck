@@ -1,0 +1,21 @@
+<launch>
+  <!--- 
+  -->
+  <param name="r_wheel_joint" value="base_r_wheel_joint" />
+  <param name="l_wheel_joint" value="base_l_wheel_joint" />
+
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+  <!--- 
+    <remap from="cmd_vel" to="cmd_vel"/>
+    <remap from="odom" to="odom"/>
+    <remap from="map" to="map" />
+  -->
+
+    <rosparam file="$(find roswell_navigation)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find roswell_navigation)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find roswell_navigation)/params/local_costmap_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find roswell_navigation)/params/global_costmap_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find roswell_navigation)/params/base_local_planner_params.yaml" command="load" />
+  </node>
+</launch>

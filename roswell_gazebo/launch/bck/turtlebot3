@@ -1,0 +1,27 @@
+
+
+
+export TURTLEBOT3_MODEL=waffle
+roslaunch turtlebot3_fake turtlebot3_fake.launch
+roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch
+roslaunch turtlebot3_gazebo turtlebot3_empty_world.launch
+roslaunch turtlebot3_gazebo turtlebot3_world.launch
+
+Separate window to go around the map:
+roslaunch turtlebot3_gazebo turtlebot3_simulation.launch
+
+===================
+roslaunch open_manipulator_gazebo open_manipulator_gazebo.launch
+roslaunch open_manipulator_moveit open_manipulator_demo.launch use_gazebo:=true
+
+===================
+roslaunch open_manipulator_with_tb3 open_manipulator_chain_with_tb3_rviz.launch
+
+-------------------
+export TURTLEBOT3_MODEL=waffle
+roslaunch turtlebot3_gazebo turtlebot3_world.launch
+roslaunch turtlebot3_gazebo turtlebot3_simulation.launch
+roslaunch turtlebot3_gazebo turtlebot3_gazebo_rviz.launch
+roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch
+
+

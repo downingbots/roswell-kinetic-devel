@@ -1,0 +1,43 @@
+<launch>
+  <arg name="scan_topic" default="base_scan"/>
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <remap from="scan" to="$(arg scan_topic)" />
+    <param name="linearUpdate" value="0.25"/>
+    <param name="angularUpdate" value="0.25"/>
+    <param name="particles" value="50"/>
+    <param name="xmin" value="-25.0"/>
+    <param name="ymin" value="-25.0"/>
+    <param name="xmax" value="25.0"/>
+    <param name="ymax" value="25.0"/>
+    <param name="delta" value="0.1"/>
+    <param name="minimumScore" value="0"/>
+    <param name="maxUrange" value="4.99"/>
+    <param name="maxRange" value="4.99"/>
+  </node>
+</launch>
+
+<!--
+http://answers.ros.org/question/202196/good-map-with-hector_mapping-and-with-odometry-only-poor-map-with-gmapping/
+    <param name="maxUrange" value="5.5"/>
+    <param name="maxRange" value="5.5"/>
+    <param name="minimumScore" value="10000"/>
+    <param name="minimumScore" value="50"/>
+_xmin:=-5.0 
+_ymin:=-5.0 
+_xmax:=5.0 
+_ymax:=5.0
+ _srr:=0
+ _srt:=0
+ _str:=0 
+_stt:=0.1
+scan:=scan _delta:=0.1 _maxUrange:=4.99 _xmin:=-5.0 _ymin:=-5.0 _xmax:=5.0 _ymax:=5.0 _particles:=30 _srr:=0 _srt:=0 _str:=0 _stt:=0.1 _minimumScore:=10000
+
+    <remap from="scan" to="$(arg scan_topic)" />
+    <param name="linearUpdate" value="0.25"/>
+    <param name="angularUpdate" value="0.25"/>
+    <param name="particles" value="50"/>
+    <param name="xmin" value="-25.0"/>
+    <param name="ymin" value="-25.0"/>
+    <param name="xmax" value="25.0"/>
+    <param name="ymax" value="25.0"/>
+-->

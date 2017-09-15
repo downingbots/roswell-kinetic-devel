@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<launch>
+  <!-- Load joint controller configurations from YAML file to parameter server -->
+  <rosparam file="$(find roswell_gazebo)/config/position_controller.yaml" command="load"/>
+
+  <!-- load the position controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+  output="screen" ns="/roswell_arm_chain" args="joint_state_controller
+                                      arm_shoulder_lift_joint_position
+                                      arm_upperarm_roll_joint_position
+                                      arm_elbow_flex_joint_position
+                                      arm_wrist_flex_joint_position
+                                      arm_wrist_roll_joint_position
+                                      l_gripper_joint_position
+                                      r_gripper_joint_position
+                                      head_pan_joint_position
+                                      head_tilt_joint_position"/>
+
+</launch>

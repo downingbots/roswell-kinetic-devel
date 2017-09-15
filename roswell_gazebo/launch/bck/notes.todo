@@ -1,0 +1,14 @@
+In roswell_gazebo, change roswell params in plugin.cpp
+In roswell_tb_sim, change roswell params in src/gazebo_ros_turtlebot3.cpp
+In turtlebot3_fake, change roswell params in src/turtlebot3_fake.cpp
+
+change diff drive parameters in roswell.gazebo.xacro
+
+
+Fix amcl.launch.xml laser parameters?
+note: base_scan, not scan
+rotated lds?
+update camera gazebo parameters?
+
+
+note: Fetch, PR2 not completely supported in kinetic, but turtlebot3 is.
